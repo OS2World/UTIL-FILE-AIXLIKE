@@ -1,0 +1,11 @@
+/ALIGN:32 /BASE:65536 /DEBUG /EXEPACK /M /NOI /NOL \unixlike\src\more\more+
+\unixlike\src\more\mogetcmd+
+\unixlike\src\more\morevio+
+\unixlike\src\more\moredio+
+\unixlike\src\more\morusage+
+\unixlike\src\more\movetols+
+\unixlike\src\more\moregrep+
+\unixlike\util\fmf\fmf+
+\unixlike\util\myerror\myerror+
+\unixlike\util\greputil\greputil,
+\unixlike\bin\more.exe,,,\unixlike\src\more\more.def;

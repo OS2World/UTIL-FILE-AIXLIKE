@@ -1,0 +1,7 @@
+NAME uniq
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Unix-like uniq command'
+PROTMODE
+HEAPSIZE 8192
+

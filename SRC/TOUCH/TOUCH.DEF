@@ -1,0 +1,6 @@
+NAME touch
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Change file access dates'
+PROTMODE
+

@@ -1,0 +1,7 @@
+NAME btoa
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'encode binary to ascii'
+PROTMODE
+HEAPSIZE 4096
+

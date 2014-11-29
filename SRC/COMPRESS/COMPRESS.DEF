@@ -1,0 +1,7 @@
+NAME compress
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Compress/decompress program'
+PROTMODE
+HEAPSIZE 4096
+

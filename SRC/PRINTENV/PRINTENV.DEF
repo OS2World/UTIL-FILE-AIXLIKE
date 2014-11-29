@@ -1,0 +1,7 @@
+NAME printenv
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Print environment variable(s)'
+PROTMODE
+HEAPSIZE 4096
+

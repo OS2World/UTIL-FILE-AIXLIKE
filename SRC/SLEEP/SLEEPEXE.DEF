@@ -1,0 +1,7 @@
+NAME Sleep
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Speep n seconds'
+PROTMODE
+HEAPSIZE 4096
+

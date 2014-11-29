@@ -1,0 +1,122 @@
+This package contains source, object, binary and documentation for
+OS/2 versions of 39 common *IX command line utilities.
+ 
+AIXLIKE INFBIN is the OS/2 on-line documentation
+ 
+AIXLIKE SCRIPT is marked up documentation for each of the commands.
+ 
+AIXLBIN ZIPBIN contains executables for the commands.  Download
+as a binary file, then use Info-Zip's unzip to unpack it into a
+subdirectory.
+ 
+Contents are
+               agrep.exe
+               at.exe
+               atd.exe
+               atd.ico
+               atob.exe
+               btoa.exe
+               compress.exe
+               cut.exe
+               df.exe
+               fgrep.exe
+               find.exe
+               grep.exe
+               head.exe
+               kill.exe
+               more.exe
+               paste.exe
+               printenv.exe
+               ps.exe
+               pwd.exe
+               rm.exe
+               sed.exe
+               sleep.exe
+               strings.exe
+               tail.exe
+               tee.exe
+               timex.exe
+               touch.exe
+               tr.exe
+               <uncompress.exe>  <-- just rename compress.exe
+               uudecode.exe
+               uuencode.exe
+               uniq.exe
+               wc.exe
+               what.exe
+               which.exe
+               xxdecode.exe
+               xxencode.exe
+               <zcat.exe>        <-- just rename compress.exe
+ 
+AIXLSRC ZIPBIN contains source and make files for the commands.
+ 
+AIXLUTL ZIPBIN contains source and make files for common routines
+shared by two or more of the commands.
+ 
+You can unzip AIXLBIN ZIPBIN into its own directory or any other
+directory in your PATH using Info-Zip's unzip.  Info-Zip is available
+on OS2TOOLS in the INFOZIP2 PACKAGE.  If you do not specify
+the -j flag, unzip will put the files in a .\bin subdirectory off the
+current directory.
+ 
+A good way to unpack the SRCBIN and UTLBIN files is to
+ 
+            - create a subdirectory (say, AIXLIKE),
+            - cd to it,
+            - receive the zip files there,
+            - unpack with "unzip aixlsrc.zip" and "unzip aixlutl.zip"
+ 
+The contents of these files are:
+ 
+     util -  contains 7 subdirectories, each of which contains
+             source and object for a routine common to one or
+             more of the utilities:
+                 fmf - routines to walk a directory tree
+                 getopt - a command line parser
+                 greputil - regular expression compilation and matching
+                 myerror - an error routine.
+                 isvalnam - returns TRUE if arg is a valid object name
+                            for the file system in use.
+                 makepath - creates a path.
+                 sleep - unixlike sleep function
+     src  -  contains a bunch of subdirectories, each of which contains
+             source, .def file for one utility.
+                 agrep - advanced grep
+                 at - scheduler
+                 compress - file compression/decompression, plus
+                            atob and btoa.
+                 cut - clips columns out of files
+                 df - displays information about file systems
+                 du - displays information about file system usage
+                 fgrep - searches files for matching strings
+                 find - searches name space for matching file objects
+                 grep - searches files for strings matching a regular
+                         expression
+                 head - displays the first part of a file
+                 kill - sends a signal to a running process
+                 more - a browser (called *page* in some *IX
+                         implementations)
+                 paste - glues columns together
+                 printenv - writes environment information to stdout
+                 ps - lists running processes
+                 pwd - writes the name of the current working directory
+                         to stdout
+                 rm    - deletes files
+                 sed   - a stream editor
+                 sleep - suspends processing for a time interval
+                 strings - extracts strings from binary files
+                 tail - displays the end of a file
+                 tee - sends a stream to a file and to stdout
+                 timex - times the execution of programs
+                 touch - changes accessed- and/or modified-dates
+                         and times
+                 tr    - translates
+                 uuencode - uuencode and uudecode
+                 uniq  - finds duplicate lines
+                 wc    - counts lines, words and characters in files
+                 what  - finds and prints SCCS keywords in files
+                 which - shows which command will be executed
+                 xx - xxencode and xxdecode, which are VNET-friendly
+                      alternatives to uuencode and uudecode
+

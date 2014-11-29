@@ -1,0 +1,8 @@
+NAME which
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Unix-like which command'
+PROTMODE
+HEAPSIZE 4096
+STACKSIZE 8192
+

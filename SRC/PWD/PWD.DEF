@@ -1,0 +1,7 @@
+NAME pwd
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Print working dir name'
+PROTMODE
+HEAPSIZE 4096
+

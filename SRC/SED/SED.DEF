@@ -1,0 +1,7 @@
+NAME sed
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Unix-line sed command'
+PROTMODE
+HEAPSIZE 16384
+

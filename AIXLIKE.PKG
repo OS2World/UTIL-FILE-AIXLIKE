@@ -1,0 +1,35 @@
+**********************  IBM Internal Use Only  *************************
+* :nick.AIXLIKE    :sec.IBM Internal Use Only         :disk.OS2TOOLS
+* :title.*IX-like commands for OS/2 protect mode
+* :version.3.50    :date.96/01/13   :summary.ANNOUNCE :support.A
+* :oname.George C. Wilson           :onode.AUSVM1     :ouser.GCWILSON
+* :aname.George C. Wilson           :anode.AUSTIN     :auser.GCWILSON
+* :bname.Ivan M. Milman             :bnode.AUSTIN     :buser.MILMAN
+* :ops.OS/2 version 2.0             :lang.C           :source.Y
+* :doc.script, inf
+* :kwd.regular-expression stream editor grep sed utility
+* :abs.OS/2 versions of 39 common *IX commands--agrep, at, atob, btoa,
+* cut, compress, df, du, fgrep, find, grep, head, kill, more, printenv,
+* ps, paste, pwd, rm, sed, sleep, strings, tail, tee, timex, touch, tr,
+* uniq, uncompress, uudecode, uuencode, wc, what, which, xxdecode,
+* xxencode, and zcat.
+* :lic.By placing material on this conference, I agree to grant
+* IBM a non-exclusive, royalty-free license for the material
+* as set forth in the LICENSE AGREEMNT file on this conference.
+************************************************************************
+* They behave, for the most part, like their *IX counterparts.
+*
+*           Download the AIXL* ZIPBIN files as binary, and unpack
+*           with INFOZIP2.  For AIXLSRC and AIXLUTL, Info-Zip's unzip
+*           will create the imbedded directories unless given the -j flag.
+*
+* List of Files:
+*
+      AIXLIKE  AVAIL    *  <-- Availability notice
+      AIXLIKE  ANNOUNCE *  <-- Announcement
+      AIXLIKE  SCRIPT   *  <-- GML documentation
+      AIXLIKE  INFBIN   *  <-- OS/2 online documentation
+      AIXLBIN  ZIPBIN   *  <-- Executables: 37 .exe files and one .ico file
+      AIXLSRC  ZIPBIN   *  <-- Source for each command
+      AIXLUTL  ZIPBIN   *  <-- Source for common routines
+

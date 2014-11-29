@@ -1,0 +1,7 @@
+NAME tee
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'splits stdin'
+PROTMODE
+HEAPSIZE 8192
+

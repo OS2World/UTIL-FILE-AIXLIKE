@@ -1,0 +1,7 @@
+NAME atob
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'restore ascii to binary'
+PROTMODE
+HEAPSIZE 4096
+

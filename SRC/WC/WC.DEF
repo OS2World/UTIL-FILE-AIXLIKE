@@ -1,0 +1,7 @@
+NAME wc
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Words, lines, bytes counter'
+PROTMODE
+HEAPSIZE 4096
+

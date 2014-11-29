@@ -1,0 +1,535 @@
+# @(#)96	1.2  src/Makefile, aixlike.src, aixlike3  1/11/96  14:57:50
+#UNIXLIKE Development makefile
+# Each program includes (or will soon) a file from \unixlike\src\include
+# Make sure this path is part of the INCLUDE environment variable
+# 05.03.93: modified for IBM C-SET/2 make
+# 10.27.94: made everything build with IBM C-SET++, rearranged macros, added
+#           clean and package (GCW)
+# 09.12.95: added xx stuff
+
+#DEBUG    = 1
+
+CC	   = icc
+CP         = copy
+DEL    	   = echo y 2>\dev\nul | del
+IPF_C      = ipfc
+IPFC_FLAGS = /inf
+LINK	   = link386
+MV	   = move
+REC_DEL	   = $(TOP)\ulrecdel.cmd
+REC_DIR_DEL= $(TOP)\ulrecdirdel.cmd
+ZIP	   = zip
+#ZIP	   = pkzip2
+ZIPFLAGS  = -r
+#ZIPFLAGS   = -r -P
+
+COMMON_CFLAGS = -c -Fo$*.obj -Gd- -Re -Sm -Ss -Q+ -W3
+OPTLINK_CFLAGS = -Mp
+SYSLINK_CFLAGS = -Ms
+DEBUG_CFLAGS  = -O- -Ti+
+OPT_CFLAGS    = -O+ -Ti-
+!ifdef DEBUG
+OPT_CFLAGS    = $(DEBUG_CFLAGS)
+!endif
+MT_CFLAGS     = -Gm+
+ST_CFLAGS     = -Gm-
+ALIGN_CFLAGS  = -Sp1
+D_CFLAGS      = -DGCW -DAIX_CORRECT -DAIXLIKE
+I_CFLAGS      = -I$S\include
+
+CDFLAGS      = $(COMMON_CFLAGS) $(DEBUG_CFLAGS) $(ST_CFLAGS) $(SYSLINK_CFLAGS) $(D_CFLAGS) $(I_CFLAGS)
+CFLAGS       = $(COMMON_CFLAGS) $(OPT_CFLAGS)   $(ST_CFLAGS) $(SYSLINK_CFLAGS) $(D_CFLAGS) $(I_CFLAGS)
+CMFLAGS      = $(COMMON_CFLAGS) $(OPT_CFLAGS)   $(MT_CFLAGS) $(SYSLINK_CFLAGS) $(D_CFLAGS) $(I_CFLAGS)
+COFLAGS      = $(COMMON_CFLAGS) $(OPT_CFLAGS)   $(ST_CFLAGS) $(SYSLINK_CFLAGS) $(D_CFLAGS) $(I_CFLAGS)
+AGREP_CFLAGS = $(COMMON_CFLAGS) $(OPT_CFLAGS)   $(MT_CFLAGS) $(OPTLINK_CFLAGS) $(D_CFLAGS) $(I_CFLAGS) $(ALIGN_CFLAGS)
+
+AGREP_LFLAGS =                  /BASE:65536             /NOI /PM:VIO /NOL
+LDFLAGS      = /DEBUG /ALIGN:32 /BASE:65536 /EXEPACK /M /NOI         /NOL
+LFLAGS       =        /ALIGN:32 /BASE:65536 /EXEPACK /M /NOI         /NOL
+!ifdef DEBUG
+LFLAGS       = $(LDFLAGS)
+!endif
+
+TOP = \unixlike
+B   = $(TOP)\bin
+MF  = $(TOP)\mapfiles
+S   = $(TOP)\src
+U   = $(TOP)\util
+
+AGD = $S\agrep
+F   = $U\fmf
+G   = $U\getopt
+GU  = $U\greputil
+M   = $U\myerror
+MP  = $U\makepath
+P   = $U\getopt
+TMPFILE = $(TOP)\tmp.tmp
+SL  = $U\sleep
+Z   = $S\more
+I   = \ibmcpp
+
+AGREPOBJ = $(AGD)\asearch.obj \
+           $(AGD)\asearch1.obj \
+           $(AGD)\bitap.obj \
+           $(AGD)\chkfile.obj \
+           $(AGD)\compat.obj \
+           $(AGD)\follow.obj \
+           $(AGD)\main.obj \
+           $(AGD)\maskgen.obj \
+           $(AGD)\mgrep.obj \
+           $(AGD)\parse.obj \
+           $(AGD)\preproc.obj \
+           $(AGD)\sgrep.obj \
+           $(AGD)\util.obj
+ATOBJS   = $F\fmf+$M\myerror
+ATDOBJS  = $F\fmfn+$M\myerron
+COMPOBJS = $S\compress\compress.obj+$S\compress\comprutl.obj
+CUTOBJS  = $S\cut\cut+$F\fmf+$G\getopt+$M\myerror
+DFOBJS   = $S\df\df+$G\getopt
+DUOBJS   = $S\du\du+$G\getopt
+#FGREPOBJ = $S\fgrep\fgrep+$F\fmfn+$G\getoptn+$M\myerron
+FGREPOBJ = $S\fgrep\fgrep+$F\fmf+$G\getopt+$M\myerror
+FINDOBJS = $S\find\find+$F\fmf+$M\myerror+$(GU)\greputil
+GREPOBJS = $S\grep\grep+$(GU)\greputil+$F\fmf+$M\myerror
+HEADOBJS = $S\head\head+$F\fmf+$M\myerror
+PASTEOBJ = $S\paste\paste+$F\fmf+$G\getopt+$M\myerror
+RMOBJS   = $S\rm\rm+$M\myerror+$G\getopt
+SEDOBJS  = $S\sed\pr_fgets+$S\sed\sed+$S\sed\sedparse+$S\sed\sedapply+$S\sed\sedtable+$F\fmf+$M\myerror+$(GU)\greputil
+SLEEPOBJ = $S\sleep\sleepexe+$(SL)\sleep
+SPLITOBJ = $S\split\split+$S\compress\comprutl
+TAILOBJS = $S\tail\tail+$F\fmf+$M\myerror+$(SL)\sleep
+TEEOBJS  = $S\tee\tee+$F\fmf+$M\myerror
+TIMEXOBJ = $S\timex\timex+$G\getopt+$M\myerror
+TOUCHOBJ = $S\touch\touch+$F\fmf+$G\getopt+$M\myerror
+TROBJ    = $S\tr\tr+$G\getopt
+UNIQOBJS = $S\uniq\uniq+$(MP)\makepath+$M\myerror
+WCOBJS   = $S\wc\wc+$F\fmf+$G\getopt+$M\myerror
+WHATOBJ  = $S\what\what+$G\getopt+$I\lib\setargv.obj
+WHICHOBJ = $S\which\which+$F\fmf+$M\myerror
+XXDOBJS  = $S\xx\xxdecode
+XXEOBJS  = $S\xx\xxencode
+
+all    : $B              $B\agrep.exe                                         \
+         $B\at.exe       $B\atd.exe      $B\atob.exe     $B\btoa.exe          \
+         $B\compress.exe $B\cut.exe      $B\df.exe       $B\du.exe            \
+         $B\fgrep.exe    $B\find.exe     $B\grep.exe     $B\head.exe          \
+         $B\kill.exe     $B\more.exe     $B\paste.exe    $B\printenv.exe      \
+         $B\ps.exe                                                            \
+         $B\pwd.exe      $B\rm.exe       $B\sed.exe      $B\sleep.exe         \
+         $B\split.exe                                                         \
+         $B\strings.exe  $B\tail.exe     $B\tee.exe      $B\timex.exe         \
+         $B\tr.exe       $B\touch.exe    $B\uniq.exe     $B\uudecode.exe      \
+         $B\uuencode.exe $B\wc.exe       $B\which.exe                         \
+         $B\atd.ico	 $B\xxencode.exe $B\xxdecode.exe $B\what.exe          \
+         $(TOP)\aixlike.inf
+
+$B:
+	-mkdir $B
+
+.SUFFIXES : .inf .ipf
+
+.ipf.inf.:
+	$(IPF_C) $< $(IPFC_FLAGS)
+	cmd /c $(MV) $(@) $(@:.INF=.inf)
+
+.c.obj.:
+	 $(CC) $(CFLAGS) $<
+
+$B\agrep.exe    :  $(AGREPOBJ) $(AGD)\agrep.def
+         $(LINK) @$(AGD)\agrep.lnk
+
+$B\at.exe       :  $S\at\at.obj $S\at\at.def $F\fmf.obj $M\myerror.obj
+         $(LINK) $(LFLAGS) $S\at\at+$(ATOBJS),$@,NUL,,$S\at\at.def;
+
+$B\atd.exe      :  $S\at\atd.obj $F\fmfn.obj $M\myerron.obj $S\at\atd.def
+         $(LINK) $(LFLAGS) $S\at\atd+$(ATDOBJS),$@,NUL,,$S\at\atd.def;
+
+$B\atd.ico      : $S\at\atd.ico
+	$(CP) $? $@
+
+$B\atob.exe     :  $S\compress\atob.obj $S\compress\atob.def
+         $(LINK) $(LFLAGS) $S\compress\atob,$@,NUL,,$S\compress\atob.def;
+
+$B\btoa.exe     :  $S\compress\btoa.obj $S\compress\btoa.def
+         $(LINK) $(LFLAGS) $S\compress\btoa,$@,NUL,,$S\compress\btoa.def;
+
+$B\compress.exe :  $S\compress\compress.obj $S\compress\comprutl.obj          \
+                   $S\compress\compress.def
+         $(LINK) $(LFLAGS) $(COMPOBJS),$@,NUL,,$S\compress\compress.def;
+
+$B\cut.exe      :  $F\fmf.obj $S\cut\cut.obj $G\getopt.obj $S\cut\cut.def $M\myerror.obj
+         $(LINK) $(LFLAGS) $(CUTOBJS),$@,NUL,,$S\cut\cut.def;
+
+
+$B\df.exe       :  $S\df\df.obj $S\df\df.def $G\getopt.obj
+         $(LINK) $(LFLAGS) $(DFOBJS),$@,NUL,,$S\df\df.def;
+
+$B\du.exe       :  $S\du\du.obj $S\du\du.def $G\getopt.obj
+         $(LINK) $(LFLAGS) $(DUOBJS),$@,NUL,,$S\du\du.def;
+
+$B\fgrep.exe    :  $F\fmfn.obj $S\fgrep\fgrep.obj $G\getoptn.obj $M\myerron.obj \
+                           $S\fgrep\fgrep.def
+#        $(LINK) $(LDFLAGS) /M $(FGREPOBJ),$@,$(MF)\fgrep.map,,$S\fgrep\fgrep.def;
+         $(LINK) $(LFLAGS) $(FGREPOBJ),$@,NUL,,$S\fgrep\fgrep.def;
+
+$B\find.exe     :  $F\fmf.obj $M\myerror.obj $(GU)\greputil.obj $S\find\find.obj \
+                                                             $S\find\find.def
+         $(LINK) $(LFLAGS) $(FINDOBJS),$@,NUL,,$S\find\find.def;
+
+$B\grep.exe     :  $F\fmf.obj $S\grep\grep.obj  $M\myerror.obj \
+                              $S\grep\grep.def $(GU)\greputil.obj
+         $(LINK) $(LFLAGS) $(GREPOBJS),$@,NUL,,$S\grep\grep.def;
+
+$B\head.exe :  $F\fmf.obj $M\myerror.obj $S\head\head.obj $S\head\head.def
+         $(LINK) $(LFLAGS) $(HEADOBJS),$@,NUL,,$S\head\head.def;
+
+$B\kill.exe     :  $S\kill\kill.obj $S\kill\kill.def
+         $(LINK) $(LFLAGS) $S\kill\kill,$@,NUL,,$S\kill\kill.def;
+
+$B\more.exe     :  $F\fmf.obj $M\myerror.obj $(GU)\greputil.obj $Z\more.obj \
+            $Z\more.def $Z\mogetcmd.obj $Z\morevio.obj $Z\moredio.obj \
+            $Z\morusage.obj $Z\movetols.obj $Z\moregrep.obj
+         $(LINK) @$S\more\more.lnk
+
+$B\paste.exe    :  $F\fmf.obj $S\paste\paste.obj $G\getopt.obj $S\paste\paste.def $M\myerror.obj
+         $(LINK) $(LFLAGS) $(PASTEOBJ),$@,NUL,,$S\paste\paste.def;
+
+$B\printenv.exe :  $S\printenv\printenv.obj $S\printenv\printenv.def
+         $(LINK) $(LFLAGS) $S\printenv\printenv,$@,NUL,,$S\printenv\printenv.def;
+
+$B\ps.exe       :  $S\ps\ps.obj $S\ps\ps.def
+         $(LINK) $(LFLAGS) $S\ps\ps,$@,NUL,,$S\ps\ps.def;
+
+$B\pwd.exe      :  $S\pwd\pwd.obj                  $S\pwd\pwd.def
+         $(LINK) $(LFLAGS) $S\pwd\pwd,$@,NUL,,$S\pwd\pwd.def;
+
+$B\rm.exe       :  $S\rm\rm.obj $G\getopt.obj $M\myerror.obj $S\rm\rm.def
+         $(LINK) $(LFLAGS) $(RMOBJS),$@,NUL,,$S\rm\rm.def;
+
+$B\sed.exe      :  $F\fmf.obj $M\myerror.obj $(GU)\greputil.obj \
+                   $S\sed\pr_fgets.obj $S\sed\sed.obj $S\sed\sed.def \
+                   $S\sed\sedparse.obj $S\sed\sedapply.obj $S\sed\sedtable.obj
+#         $(LINK) $(LFLAGS) $(SEDOBJS),$@,NUL,,$S\sed\sed.def;
+         $(LINK) @$S\sed\sed.lnk
+
+$B\sleep.exe    :  $S\sleep\sleepexe.obj $(SL)\sleep.obj $S\sleep\sleepexe.def
+         $(LINK) $(LFLAGS) $(SLEEPOBJ),$@,NUL,,$S\sleep\sleepexe.def;
+
+$B\split.exe    :  $S\split\split.obj $S\compress\comprutl.obj          \
+                   $S\split\split.def
+         $(LINK) $(LFLAGS) $(SPLITOBJ),$@,NUL,,$S\split\split.def;
+
+$B\strings.exe  :  $S\strings\strings.obj  $I\lib\setargv.obj $S\strings\strings.def
+         $(LINK) $(LFLAGS) /NOE $S\strings\strings+$I\lib\setargv.obj,$@,NUL,,$S\strings\strings.def;
+
+$B\tail.exe     :  $F\fmf.obj $M\myerror.obj $(SL)\sleep.obj $S\tail\tail.obj \
+                                                             $S\tail\tail.def
+         $(LINK) $(LFLAGS) $(TAILOBJS),$@,NUL,,$S\tail\tail.def;
+
+$B\tee.exe      :  $F\fmf.obj $S\tee\tee.obj  $S\tee\tee.def  $M\myerror.obj
+         $(LINK) $(LFLAGS) $(TEEOBJS),$@,NUL,,$S\tee\tee.def;
+
+$B\timex.exe    :  $S\timex\timex.obj $G\getopt.obj $S\timex\timex.def        \
+            $M\myerror.obj
+         $(LINK) $(LFLAGS) $(TIMEXOBJ),$@,NUL,,$S\timex\timex.def;
+
+$B\touch.exe    :  $F\fmf.obj $S\touch\touch.obj $G\getopt.obj $M\myerror.obj \
+            $S\touch\touch.def
+         $(LINK) $(LFLAGS) $(TOUCHOBJ),$@,NUL,,$S\touch\touch.def;
+
+$B\tr.exe       :  $G\getopt.obj $S\tr\tr.obj $S\tr\tr.def
+         $(LINK) $(LFLAGS) $(TROBJ),$@,NUL,,$S\tr\tr.def
+
+$B\uniq.exe     :  $(MP)\makepath.obj $M\myerror.obj $S\uniq\uniq.obj         \
+            $S\uniq\uniq.def
+         $(LINK) $(LFLAGS) $(UNIQOBJS),$@,NUL,,$S\uniq\uniq.def;
+
+$B\uudecode.exe :  $S\uuencode\uudecode.obj $S\uuencode\uudecode.def
+         $(LINK) $(LFLAGS) $S\uuencode\uudecode,$@,NUL,,$S\uuencode\uudecode.def
+
+$B\uuencode.exe :  $S\uuencode\uuencode.obj $S\uuencode\uuencode.def
+         $(LINK) $(LFLAGS) $S\uuencode\uuencode,$@,NUL,,$S\uuencode\uuencode.def
+
+$B\wc.exe       :  $F\fmf.obj $S\wc\wc.obj $G\getopt.obj $M\myerror.obj $S\wc\wc.def
+         $(LINK) $(LFLAGS) $(WCOBJS),$@,NUL,,$S\wc\wc.def;
+
+$B\what.exe     :  $S\what\what.obj $G\getopt.obj $S\what\what.def
+         $(LINK) /NOE $(LFLAGS) $(WHATOBJ),$@,NUL,,$S\what\what.def;
+
+$B\which.exe    :  $F\fmf.obj $S\which\which.obj $M\myerror.obj $S\which\which.def
+         $(LINK) $(LFLAGS) $(WHICHOBJ),$@,NUL,,$S\which\which.def;
+
+$B\xxdecode.exe :  $S\xx\xxdecode.obj $S\xx\xxdecode.def
+         $(LINK) $(LFLAGS) $S\xx\xxdecode,$@,NUL,,$S\xx\xxdecode.def
+
+$B\xxencode.exe :  $S\xx\xxencode.obj $S\xx\xxencode.def
+         $(LINK) $(LFLAGS) $S\xx\xxencode,$@,NUL,,$S\xx\xxencode.def
+
+
+$S\at\at.obj             : $S\at\at.c $S\at\at.h 
+         $(CC) $(CFLAGS) -I$F -I$S\at $*.c
+
+$S\at\atd.obj            : $S\at\atd.c $S\at\at.h
+         $(CC)  $(CMFLAGS) -I$S\at -I$F $*.c
+
+$S\compress\atob.obj     : $S\compress\atob.c
+         $(CC) $(CFLAGS) -DOS2 $*.c
+
+$S\compress\btoa.obj     : $S\compress\btoa.c
+         $(CC) $(CFLAGS) $*.c
+
+$S\compress\compress.obj : $S\compress\compress.c
+         $(CC) $(CFLAGS) -DOS2 $*.c
+
+$S\compress\comprutl.obj : $S\compress\comprutl.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\cut\cut.obj           :  $S\cut\cut.c $F\fmf.h
+         $(CC) $(CFLAGS)  /I$F $*.c
+
+$S\df\df.obj             :  $S\df\df.c $S\df\df.h
+         $(CC) $(COFLAGS) -I$S\df $*.c
+
+$S\du\du.obj             :  $S\du\du.c
+         $(CC) $(COFLAGS) -I$S\du $*.c
+
+$S\fgrep\fgrep.obj       :  $S\fgrep\fgrep.c $F\fmf.h
+         $(CC) $(COFLAGS) -Sn- /I$F $*.c
+
+$S\find\find.obj         :  $S\find\find.c $(GU)\greputil.h $F\fmf.h
+         $(CC) $(COFLAGS) /I$(GU) /I$F $*.c
+
+$S\grep\grep.obj         :  $S\grep\grep.c $F\fmf.h $S\grep\grep.h $(GU)\greputil.h
+         $(CC) $(COFLAGS) /I$(GU) /I$F /I$S\grep $*.c
+
+$S\head\head.obj         :  $S\head\head.c $F\fmf.h
+         $(CC) $(COFLAGS) /I$F $*.c
+
+$S\kill\kill.obj         :  $S\kill\kill.c
+         $(CC) $(COFLAGS) $*.c
+
+$Z\more.obj              :  $Z\more.c $Z\more.h
+         $(CC) $(COFLAGS) /I$Z /I$F $*.c
+
+$Z\mogetcmd.obj          : $Z\mogetcmd.c $Z\more.h
+         $(CC) $(COFLAGS) /I$Z $*.c
+
+$Z\morevio.obj           :  $Z\morevio.c $Z\more.h
+         $(CC) $(COFLAGS) /I$Z $*.c
+
+$Z\moredio.obj           :  $Z\moredio.c $Z\more.h
+         $(CC) $(COFLAGS) /I$Z $*.c
+
+$Z\morusage.obj          :  $Z\morusage.c
+         $(CC) $(COFLAGS) /I$Z $*.c
+
+$Z\movetols.obj          : $Z\movetols.c $Z\more.h
+         $(CC) $(COFLAGS) /I$Z $*.c
+
+$Z\moregrep.obj          : $Z\moregrep.c $Z\more.h $S\grep\grep.h $(GU)\greputil.h
+         $(CC) $(COFLAGS) /I$(GU) /I$S\grep /I$Z $*.c
+
+$S\paste\paste.obj       :  $S\paste\paste.c $F\fmf.h
+         $(CC) $(CFLAGS)  /I$F $*.c
+
+$S\printenv\printenv.obj : $S\printenv\printenv.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\ps\ps.obj             : $S\ps\ps.c $S\ps\ps.h
+         $(CC) $(COFLAGS) /I$S\ps $*.c
+
+$S\pwd\pwd.obj           :  $S\pwd\pwd.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\rm\rm.obj             :  $S\rm\rm.c $S\rm\rm.h
+         $(CC) $(COFLAGS) /I$S\rm $*.c
+
+$S\sed\pr_fgets.obj           :  $S\sed\pr_fgets.c
+         $(CC) $(COFLAGS) /I$F /I$S\sed $*.c
+
+$S\sed\sed.obj           :  $S\sed\sed.c $S\sed\sed.h $F\fmf.h
+         $(CC) $(COFLAGS) /I$F /I$S\sed $*.c
+
+$S\sed\sedparse.obj      :  $S\sed\sedparse.c $S\sed\sed.h
+         $(CC) $(COFLAGS) /I$S\sed $*.c
+
+$S\sed\sedapply.obj      :  $S\sed\sedapply.c $S\sed\sed.h
+         $(CC) $(COFLAGS) /I$S\sed /I$S\grep $*.c
+
+$S\sed\sedtable.obj      :  $S\sed\sedtable.c $S\sed\sed.h
+         $(CC) $(COFLAGS) /I$S\sed $*.c
+
+$S\sleep\sleepexe.obj    :  $S\sleep\sleepexe.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\split\split.obj       :  $S\split\split.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\strings\strings.obj   :  $S\strings\strings.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\tail\tail.obj         :  $S\tail\tail.c $F\fmf.h
+         $(CC) $(COFLAGS) /I$F $*.c
+
+$S\tee\tee.obj           :  $S\tee\tee.c $F\fmf.h
+         $(CC) $(COFLAGS) /I$F $*.c
+
+$S\timex\timex.obj       :  $S\timex\timex.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\touch\touch.obj       :  $S\touch\touch.c $F\fmf.h
+         $(CC) $(COFLAGS) /I$F $*.c
+
+$S\tr\tr.obj             :  $S\tr\tr.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\uniq\uniq.obj         :  $S\uniq\uniq.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\uuencode\uudecode.obj :  $S\uuencode\uudecode.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\uuencode\uuencode.obj :  $S\uuencode\uuencode.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\wc\wc.obj             :  $S\wc\wc.c $F\fmf.h
+         $(CC) $(COFLAGS) /I$F $*.c
+
+$S\what\what.obj       :  $S\what\what.c
+         $(CC) $(COFLAGS) /I$F $*.c
+
+$S\which\which.obj       :  $S\which\which.c $F\fmf.h
+         $(CC) $(COFLAGS) /I$F $*.c
+
+$F\fmf.obj               :  $F\fmf.c $F\fmf.h
+         $(CC) $(COFLAGS) $*.c
+
+$F\fmfn.obj              :  $F\fmf.c $F\fmf.h
+         $(CC) $(CMFLAGS) $F\fmf.c
+
+$G\getopt.obj            : $G\getopt.c
+         $(CC) $(COFLAGS) $*.c
+
+$G\getoptn.obj            : $G\getopt.c
+         $(CC) $(CMFLAGS) $G\getopt.c
+
+$(GU)\greputil.obj       : $(GU)\greputil.c $(GU)\greputil.h
+         $(CC) $(COFLAGS) -I$(GU) $*.c
+
+$M\myerror.obj           : $M\myerror.c
+         $(CC) $(COFLAGS) $*.c
+
+$M\myerron.obj           : $M\myerror.c
+         $(CC) $(CMFLAGS) $M\myerror.c
+
+$(MP)\makepath.obj       : $(MP)\makepath.c
+         $(CC) $(COFLAGS) $*.c
+
+$(SL)\sleep.obj  :  $(SL)\sleep.c
+         $(CC) $(COFLAGS) $*.c
+
+$S\xx\xxdecode.obj :  $S\xx\xxdecode.c
+         $(CC) $(CDFLAGS) $*.c
+
+$S\xx\xxencode.obj :  $S\xx\xxencode.c
+         $(CC) $(COFLAGS) $*.c
+
+
+#
+# AGREP STUFF
+#
+$(AGD)\asearch.obj:   $(AGD)\agrep.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\asearch1.obj:  $(AGD)\agrep.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\bitap.obj:     $(AGD)\agrep.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\chkfile.obj:   $(AGD)\chkfile.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\compat.obj:    $(AGD)\agrep.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\follow.obj:    $(AGD)\re.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\main.obj:      $(AGD)\agrep.h $(AGD)\chkfile.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\maskgen.obj:   $(AGD)\agrep.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\mgrep.obj:     $(AGD)\agrep.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\parse.obj:     $(AGD)\re.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\preproc.obj:   $(AGD)\agrep.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\sgrep.obj:     $(AGD)\agrep.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(AGD)\util.obj:      $(AGD)\re.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(S)\util.obj:      $(AGD)\re.h
+        $(CC) $(AGREP_CFLAGS) $*.c
+
+$(TOP)\aixlike.inf: $(TOP)\aixlike.ipf
+
+#
+# Packaging and cleaning rules
+#
+ship: $(REC_DEL) _clean all _prepackage package _clean_rec_del
+
+package:
+	cd $(TOP)
+	$(ZIP) $(ZIPFLAGS) aixlsrc.zip src\*
+	$(ZIP) $(ZIPFLAGS) aixlutl.zip util\*
+	$(ZIP) $(ZIPFLAGS) aixlbin.zip bin\*
+
+prepackage: $(REC_DEL) _prepackage _clean_rec_del
+
+_prepackage:
+	-$(DEL)      $(TOP)\*.zip 2>\dev\nul
+	-@$(REC_DEL) $S\*.exe
+	-@$(REC_DEL) $U\*.exe
+	-@$(REC_DEL) $S\*.i
+	-@$(REC_DEL) $U\*.i
+	-@$(REC_DEL) $S\*.map
+	-@$(REC_DEL) $U\*.map
+	-@$(REC_DEL) $S\*.obj
+	-@$(REC_DEL) $U\*.obj
+
+clean: $(REC_DEL) _clean _clean_rec_del
+
+_clean:
+	-$(DEL)      $(TOP)\*.zip 2>\dev\nul
+	-@$(REC_DEL) $B\*
+	-@$(REC_DEL) $S\*.exe
+	-@$(REC_DEL) $U\*.exe
+	-@$(REC_DEL) $S\*.i
+	-@$(REC_DEL) $U\*.i
+	-@$(REC_DEL) $S\*.map
+	-@$(REC_DEL) $U\*.map
+	-@$(REC_DEL) $S\*.obj
+	-@$(REC_DEL) $U\*.obj
+
+$(REC_DEL):
+	@echo /* Auto-generated by AIXLIKE Makefile.  Please delete. */	 > $@
+	@echo call rxfuncadd 'sysloadfuncs', 'rexxutil', 'sysloadfuncs'	>> $@
+	@echo call sysloadfuncs						>> $@
+	@echo parse arg fmask .						>> $@
+	@echo rc = SysFileTree(fmask,file,'FSO')			>> $@
+   	@echo do i = 1 to file.0					>> $@
+	@echo   say '	del' file.i					>> $@
+	@echo   call SysFileDelete file.i				>> $@
+	@echo end							>> $@
+
+_clean_rec_del:
+	-@$(DEL) $(REC_DEL)

@@ -1,0 +1,7 @@
+NAME KILL
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Unix-like kill command'
+PROTMODE
+HEAPSIZE 8000
+

@@ -1,0 +1,7 @@
+NAME tail
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Unix-line tail command'
+PROTMODE
+HEAPSIZE 8192
+

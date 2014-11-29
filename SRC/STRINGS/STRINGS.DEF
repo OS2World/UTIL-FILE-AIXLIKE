@@ -1,0 +1,7 @@
+NAME strings
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Unix-like strings command'
+PROTMODE
+HEAPSIZE 8192
+

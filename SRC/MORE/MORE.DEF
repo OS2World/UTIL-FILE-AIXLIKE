@@ -1,0 +1,7 @@
+NAME more
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Unix-line more command'
+PROTMODE
+HEAPSIZE 16384
+

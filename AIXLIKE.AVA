@@ -1,0 +1,202 @@
+96/01/10 - 3.50  - Added the what command.
+                 - Changed archive method from pkzip to Info-Zip.
+                 - Changed getopt.c to support the AIX_CORRECT environment
+                   variable--forward slashed input filenames should now
+                   work for programs that use getopt() if AIX_CORRECT is set.
+                 - The touch command now rounds down to the nearest 2 seconds
+                   instead of the nearest minute.
+                 - Made ugly hack to strings.c to support filename globbing.
+                 - Placed AIXLIKE under source control.  This is not a real
+                   build yet, but the next one should be.  You should be
+                   able to run what against these files to see the expanded
+                   SCCS keywords.
+95/09/18 - 3.42  - Renamed private_fgets.c to pr_fgets.c in sed.
+                     o Thanks to Steve Nadas for the bug report.
+                     o Now our old pkzip2 can handle it.
+                 - Changed tee's output filemode to binary.
+                     o Thanks to Jim Hicks for great testing and moral support!
+95/09/15 - 3.41  - Redirected atd child process stderr to stdout.
+95/09/12 - 3.40  - Fixed badly broken sed, I hope.
+                     o Thanks to Steve Nadas for reporting the bug.
+                     o Wrote my own fgets to make the solution more
+                       centralized.  If this sed is significantly slower
+                       reading files, I will rewrite the fgets.
+                 - Fixed double CR in tr.
+                     o Thanks to Robert A. Wilson for the problem report.
+                 - Added xxdecode/xxencode provided by Joe Kesselman.
+                     o Thanks, Joe!
+                     o Changed the syntax to conform to uudecode and uuencode,
+                       which allows them to be used as filters.
+                     o Could not make xxdecode work optimized.  So, I built
+                       the binary unoptimized.
+                 - Added AIX_CORRECT environment variable check to ps that
+                   turns on PID sorting, lowercase proc names, and forward
+                   slashes.
+                     o This allows ps, which is the only good ps for OS/2 I
+                       have seen, to be easily used in conjunction with GNU and
+                       MKS utilities.
+                     o Used a linked list to do the sort.  Should be fine for
+                       small n, but if it's too slow, will replace algorithm.
+                     o I may make other utilities handle forward slashes as
+                       path segment delimiters.  Please send feedback on the
+                       your opinion of the ps enhancement.
+                 - Added Marty Klos' uuencode fix that converts spaces to
+                   backtics.
+                     o Thanks, Marty!
+                 - Modified tail so that it now works with files being written
+                   by another process.
+                     o Thanks, Bill Siddall, for letting me know about the bug.
+                     o Changed fopen() to sopen()/fdopen().
+                 - Modified compress so that mode bits and use as a filter
+                   work.
+                     o Changed mask of stat struct mode field to 07677 from
+                       07777 to mask off x bit for chmod().  The x mode bit no
+                       longer causes chmod to generate an error.
+                     o Added binary freopens of stdin and stdout to compress
+                       so that it works correctly as a filter.
+                 - Modified atob and btoa to freopen stdin and stdout in
+                   binary mode.
+                     o The C-Set++ manpage says that setmode "does not affect
+                       the translation mode of streams."
+                     o Changed setmode() calls to freopen() calls so that
+                       the standard streams are binary mode.
+                 - Modified uudecode and uuencode to freopen stdin in binary
+                   mode.
+                 - Modified wc to freopen stdin in binary mode.
+                 - Added casts to function pointer params to qsort() and
+                   _beginthread() in atd to get rid of param list warnings.
+                 - Added casts to VioReadCellStr() and VioGetCurPos() in
+                   more to remove int/unsigned short mismatch warnings.
+95/02/24 - 3.30  First update by George and Ivan.
+                   - ps and more are now 32-bit programs.
+                   - tr is fixed (thanks to Bob Blair).
+                   - df now calculates remote drive numbers correctly and
+                     disables error popups (both thanks to Marty Klos),
+                     and by popular demand, it displays the remote
+                     filesystem old style.
+                   - sed now handles the $ address properly (thanks to
+                     Benno Staebler for reporting the bug).
+                   - Build and packaging have been rearranged.  Added
+                     /BASE:65536 to link flags to decrease exe sizes
+                     and load times.
+                   - agrep has a stdin fix from David Twyerould (thanks
+                     David).
+                   - at has a fix which prevents it from trapping sometimes.
+ 
+94/10/03 - 3.23  du and df were still messed up from the new build
+                 environment.  Only those two programs change.
+ 
+94/09/28 - 3.22  Screwed up and didn't update the zip files.
+ 
+94/09/27 - 3.21  Fixed build problems with at and compress.  Added
+                 David Twyerould's port of agrep.
+ 
+94/09/23 - 3.2   A final update on my departure from IBM.  Added
+                 cut and paste.  Many bug fixes - all that I announced
+                 on the forum and a couple more.  Changed the packaging
+                 to ZIP.
+ 
+93/04/16 - 3.11  Relinked with larger stacks for all programs,
+                 to avoid problems with SP and OS/2 2.1.
+ 
+93/03/28 - 3.1.  Added tr, atob, btoa, uuencode, uudecode
+ 
+92/06/01 - 3.01.  Fixes for traps in find and fgrep, and for failures
+           in compress.
+ 
+92/05/11 - Release 3.0  Added at, compress, strings, tee, uniq and which
+           Fixed numerous bugs.  In particular, sed is now much
+           closer to the AIX model.  ps now works under OS/2 V2.
+ 
+            Two known bugs remain:
+               1. more will not display the last line of a file if
+                  it does not end with /n or CTL-Z.
+               2. rm removes a directory even if it isn't empty
+                  (emptying it first, of course).
+ 
+           All the programs are now compiled for full optimization.
+           This really helps the speed of grep and fgrep.
+ 
+91/12/04 - 2.02.  more trapped.  It was a build problem, reported
+           by Mr. Borrello.
+ 
+91/12/04 - 2.01.  Fixed bad version of rm.  MAKE SURE YOU DESTROY
+           ANY VERSION OF rm DATED 12/03/91;  it can wipe out
+           unexpected parts of your file system (though it's much
+           more likely just to fail.)
+ 
+91/12/03 - Release 2.0.  Added head, tail, sleep and df; included
+           accumulated fixes.  Fixed too many bugs to mention.
+           sed, more and rm in particular had many annoying
+           inconsistancies corrected.  Thanks to the many who
+           pointed out incorrect behavior.
+ 
+91/05/10 - Fix for ugly spurious error message issued when -s switch
+ 1.0d      is used in several commands.  Bug was introduced in 1.0c.
+ 
+91/05/08 - Fixes problems in find when the archive bit
+ 1.0c      was off.  fgrep, grep, find, more, sed, touch and wc will
+           now operate on hidden and system files.  Other fixes.
+ 
+91/05/03 - fixed problem with grep -p, and other reported problems.
+ 1.0b      Seperated source from executables to make it easier for
+           those who just want the programs.
+ 
+91/05/02 - corrected problem with grep that caused a trap D when
+ 1.0a      the -i switch was used.
+ 
+           changed ps to accomodate a larger number of active processes
+------------------------------------------------------------------------
+AIXLIKE PACKAGE on OS2TOOLS contains OS/2 protect-mode
+implementations of 17 common AIX utilities:
+ 
+    df    - displays information about file systems
+    fgrep - searches files for matching strings
+    find  - searches name space for matching file objects
+    grep  - searches files for strings matching a regular expression
+    head  - displays the first part of a stream
+    kill  - sends a signal to a running process
+    more  - a browser (called *page* in some *IX implementations)
+    printenv - writes environment information to stdout
+    ps    - lists running processes (OS/2 versions 1.2 and 1.3 only)
+    pwd   - writes the name of the current working directory to stdout
+    rm    - deletes files
+    sed   - a stream editor
+    sleep - suspends execution for a time interval
+    tail  - displays the end of a file
+    timex - times the execution of programs
+    touch - changes accessed- and/or modified-dates and times
+    wc    - counts lines, words and characters in files
+ 
+For better or worse, these implementations retain much of the "look and
+feel" of their counterparts in AIX Version 3.  They support the same
+command line arguments (with a few exceptions, described in the
+accompanying documentation), and all of the function that is in turn
+supported by the underlying operating system.
+ 
+Some features implement function that is not currently available on
+OS2TOOLS:
+ 
+     -  grep implements full regular expression matching, including
+        subpatterns and occurrence operators.  (Unfortunately, it
+        is slower than Ralph Yozzo's GREPOS2.)
+ 
+     -  sed implements a fairly powerful stream editor.
+ 
+     -  fgrep can match up to 256 strings at once.
+ 
+     -  touch has more features than the other touch-type tools I
+        have seen.
+ 
+     -  more gives a single means for browsing both piped output and
+        multiple files.
+ 
+     -  sleep, head and tail have been requested by network users.
+ 
+Source is provided.
+ 
+Most of this code has been in use for about many months.  Lots of bugs have
+been fixed; some are gone, but some remain.  If you find 'em, we'll fix
+'em.  Report problems to GCWILSON at AUSTIN, MILMAN at AUSTIN, or to AIXLIKE
+FORUM on IBMPC.
+

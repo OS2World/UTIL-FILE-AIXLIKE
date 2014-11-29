@@ -1,0 +1,7 @@
+NAME split
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Break up files'
+PROTMODE
+HEAPSIZE 4096
+

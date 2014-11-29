@@ -1,0 +1,2483 @@
+.* @(#)95	1.2  aixlike.script, aixlike.src, aixlike3  1/11/96  20:24:37
+:userdoc.
+:revision id=350 char='|' run='YES'
+:prolog.
+:title stitle='AIXLIKE'
+AIXLIKE Utilities
+Version 3.50
+User Information
+:etitle.
+:date.January 7, 1997
+:author.G.R. Blair
+:author.G.C. Wilson
+:author.I.M. Milman
+:eprolog.
+:frontm.
+:tipage.
+:snotice.
+Copyright International Business Machines Corporation, 1991, 1996.
+All rights reserved.
+:esnotice.
+:toc.
+:preface.
+:p.
+:rev refid=330.
+Bob Blair originally created the AIXLIKE package.  When Bob left the company
+in early October 1994, George Wilson and Ivan Milman became AIXLIKE's
+caretakers.  This text and the tools remain pretty much as Bob wrote them.
+:p.
+All thanks to Bob and to those who contributed their works.
+:erev refid=330.
+:body.
+:h1.In General
+:p.The programs in the AIXLIKE package are OS/2 implementations of the
+like-named AIX version 3.1 shell commands.  The command line syntax is
+supposed to be identical to the AIX versions (with a couple of exceptions
+noted below), and the output is supposed to be identical except in cases of
+operating system dependent information.
+:p.Differences in the operation of the OS/2 and AIX versions of these utilities
+should be limited to differences in the shells and differences in the
+underlying OS.  Here are some of the differences:
+:ul.
+:li.Path separator character.  The OS/2 utilities accept only OS/2 style path
+names.
+:li.Ambiguous path names.  The OS/2 versions do not accept ambiguous directory
+names as part of paths.  Instead, most of the programs support an -s switch,
+which applies the utility recursively to subdirectories.  For example,
+:xmp.
+       wc -s *.c
+:exmp.
+counts lines, words and bytes for each file matching "*.c" in the current
+working directory and in each subdirectory below it.
+:li.Quoted strings. None of the various quoting schemes implemented by the
+AIX shells are supported.  In particular,
+:ul.
+:li.Escape sequences such as \n and \t are only weakly supported on the
+command line.  I've made an effort to interpret these correctly in sed.
+:li.Quotes in the form 'this is a quoted string' are not supported.  Use
+double quotes: "this is a supported quoted string".
+:li.Single quotes are not supported.  Use double quotes.
+:eul.
+:eul.
+:p.The programs in the AIXLIKE package have had quite a bit of testing,
+but you can expect to find bugs in them, and there are probably places
+where my understanding of the AIX versions is wrong or incomplete.
+Most of them have been available on OS2TOOLS for a couple of years,
+and, based on my mail, have had at least moderate use.
+I have used the programs extensively under OS/2 version 2.0, 2.1 and
+.*2.11.  I do not know how they run under WARP.  Most of the utilities
+2.11.  :rev refid=330. They seem to run well under Warp, but I have not
+performed comprehensive testing.  All of the utilities are now 32-bit.
+Please post bug reports, deviations from AIX 3.1 behavior, and
+other comments to the AIXLIKE FORUM on IBMPC.  You may also contact
+George (Vnet GCWILSON AT AUSTIN, Internet gcwilson@dss1.austin.ibm.com)
+or Ivan (Vnet MILMAN AT AUSTIN, Internet milman@dss1.austin.ibm.com) via
+email.
+:erev refid=330.
+.*The programs are in use on my desk, running under
+.*OS/2 version 1.3, but they have not been extensively tested on version
+.*1.2 or 2.0.
+.*I will accept, and try
+.*to fix, all bug reports.  I will also accept reports of variance from
+.*pec'&mdash.that is, differences between the way these programs run and
+.*he way their counterparts run on AIX 3.1.  Bug reports and other comments
+.*should go to AIXLIKE FORUM on the IBMPC conference disk.
+.*:p.I will not be employed by IBM after October 9, 1994 and will not
+.*(obviously) be able to provide support after that date.  If I can find
+.*someone to take over and support
+.*the code, his or her name will be posted in AIXLIKE FORUM on the
+.*IBMPC conference disk.
+:p.Source is provided for all the code in the AIXLIKE package.  To the best
+of my knowledge, this code is 'clean': it is the product of my own work, done
+on my own time, and is therefore wholly owned by IBM.  (Exceptions to
+this are noted below.)
+To the extent that my permission is required, I grant permission to any
+employee of IBM to use or modify this code for IBM management-approved
+purposes.  I'd appreciate a note telling me what you did to it, though; and
+if you find a way to speed up the grep matching routines, please, PLEASE,
+let me know.
+:p.There are also versions of LEX and YACC (actually FLEX and BISON)
+on PCTOOLS.  They are in the YACC package owned by John Q. Walker.  I've
+used them, and they have worked well for me.  They are not distributed
+with source.  Brian Yoder has a version of ls, as well as chmod, cd,
+and other programs in UTIL2 PACKAGE on OS2TOOLS.
+:p.The version of df in this package was written by Peter J. Schwaller.
+I made some trivial additions to it.  If you find a bug, it's probably
+mine; if you want to pat someone on the back, send mail to PJS at
+RALVMC.
+:p.The version of du in this package was written by Dierk Schueler.
+Likewise, the code he gave me was of very high quality and I thank him
+for it.
+:p.The version of compress in this package is modified from public
+domain code.  You will have to get permission from legal to redistribute
+the compress code.
+:p.The version of agrep was modified by David Twyerould from publicly
+available code written by Wu and Manber at the University of Arizona.
+:rev refid=340.
+:p.Joe Kesselman supplied the xxdecode and xxencode programs.  They were
+written by a contractor in his group, and should prove to be useful for anyone
+who must send data through VNET mail.
+:erev refid=340.
+:p.If anyone has other AIXLIKE utilities that they would like to share,
+I'll be glad to include them in this package.  I ask only that
+:ol.
+:li.You make the user interface as much as possible like the AIX version 3.1
+counterpart.
+:li.You agree to fix bugs as time allows.
+:li.Your source is 'clean' and you agree to distribute it under the
+restrictions I outlined above.
+:eol.
+:p.There are versions of many UNIX utilities (including tar and awk)
+available by anonymous ftp from :hp2.ftp-os2.cdrom.com:ehp2..
+The grep from there is better than mine.  Make sure you have the
+proper legal permissions to use any software you bring in from outside
+IBM.
+:p.The program descriptions in the following chapters contain material
+taken from :hp1.AIX Commands Reference for IBM RISC System/6000.:ehp1.
+volumes 1 - 3.
+:h1.The AIXLIKE Utilities
+:h2 id=agrep.AGREP2 for OS/2 V2.04
+:p. agrep - search a file for a string or regular expression, with approximate
+matching capabilities
+:p.Syntax:
+:xmp.
+AGREP &lbrk.-#bcdehiklnpqstvwxBDGIS&rbrk. &lbrk.-f patternfile&rbrk. pattern &lbrk.files&rbrk.
+:exmp.
+:p.DESCRIPTION
+:p.agrep searches the input filenames (standard input is the default, but see a
+warning under LIMITATIONS) for records containing strings which either
+exactly or approximately match a pattern.
+:p.A record is by default a line, but it can be defined differently using the -d
+option (see below). Normally, each record found is copied to the standard
+output. Approximate matching allows finding records that contain the pattern
+with several errors including substitutions, insertions, and deletions.
+For example, Massechusets matches Massachusetts with two errors (one
+substitution and one insertion).  Running
+:xmp.
+agrep -2 Massechusets foo
+:exmp.
+outputs
+all lines in foo containing any string with at most 2 errors from Massechusets.
+:p.agrep supports many kinds of queries including arbitrary wild cards, sets of
+patterns, and in general, regular expressions. See PATTERNS below.
+:p.It supports most of the options supported by the grep family plus several
+more (but it is not 100% compatible with grep).
+:p.For more information on the algorithms used by agrep see Wu and Manber, "Fast
+Text Searching With Errors," Technical report #91-11, Department of Computer
+Science, University of Arizona, June 1991 (available by anonymous ftp from
+cs.arizona.edu in agrep/agrep.ps.1), and Wu and Manber, "Agrep -- A Fast
+Approximate Pattern Searching Tool", To appear in USENIX Conference 1992
+January (available by anonymous ftp from cs.arizona.edu in agrep/agrep.ps.2).
+:p.As with the rest of the grep family, the characters (|, /) can cause
+unexpected results when included in the pattern, as these characters are also
+meaningful to the shell. To avoid these problems, one should always enclose the
+entire pattern argument in double quotes, i.e., "pattern".
+:p.When agrep is applied to more than one input file, the name of the file is
+displayed preceding each line which matches the pattern.  The filename is not
+displayed when processing a single file, so if you actually want the filename
+to appear, use null as a second file in the list.
+:p.OPTIONS
+:dl tsize=16.
+:dt.-#
+:dd.# is a non-negative integer (at most 8) specifying the maximum number of
+errors permitted in finding the approximate matches (defaults to zero).
+Generally, each insertion, deletion, or substitution counts as one error.
+It is possible to adjust the relative cost of insertions, deletions and
+substitutions (see -I -D and -S options).
+:dt.-b
+:dd.Best match mode. Find closest matches to pattern, no prompting. Will show
+all best matches, without telling how many 'errors' there were. Example:
+:xmp.
+  agrep -b "wonderful" *.doc
+:exmp.
+will match anything resembling wonderful with up to 8 differences.
+:dt.-c
+:dd.Case-sensitive search e.g., "A" and "a" are not considered equivalent.
+:dt.-d "delim"
+:dd.Define delim to be the separator between two records. The default value
+is '$', namely a record is by default a line. delim can be a string of
+size at most 8 (with possible use of &caret. and $), but not a regular
+expression.  Text between two delim's, before the first delim, and after
+the last delim is considered as one record.
+For example, -d '$$' defines paragraphs as records and -d '&caret.From\ '
+defines mail messages as records.
+agrep matches each record separately.
+NOTE: This option does not currently work with regular expressions.
+:dt.-e " pattern"
+:dd.Same as a simple pattern argument, but useful when the pattern begins with
+a '-'
+:dt.-f "patternfile"
+:dd.patternfile contains a set of (simple) patterns.
+The output is all lines that match at least one of the patterns in
+patternfile. Currently, the -f option works only for exact match and for simple
+patterns (any meta symbol is interpreted as a regular character);
+it is compatible only with -c, -h, -i, -l, -q, -v, -w, and -x options.
+See LIMITATIONS for size bounds.
+:dt.-h
+:dd.Do not display filenames.
+:dt.-i
+:dd.Display only the count of matching records.
+:dt.-c
+:dd.Case-sensitive search e.g., "A" and "a" are not considered equivalent.
+:dt.-k
+:dd.No symbol in the pattern is treated as a meta character.
+For example,
+:xmp.
+agrep -k 'a(b|c)*d' foo
+:exmp.
+will find
+the occurrences of a(b|c)*d in foo whereas
+:xmp.agrep 'a(b|c)*d' foo
+:exmp.
+will find substrings in foo that match the regular expression 'a(b|c)*d'.
+:dt.-l
+:dd.List only the files that contain a match.
+This option is useful for looking for files containing a certain pattern.
+For example, " agrep -l 'wonderful'  * " will list the names of those
+files in current directory that contain the word 'wonderful'.
+:dt.-n
+:dd.Each line that is printed is prefixed by its record number in the file.
+:dt.-p
+:dd.Find records in the text that contain a supersequence of the pattern.
+For example,
+:xmp.
+  agrep -p DCS foo
+:exmp.
+will match "Department of Computer Science."
+:dt.-q
+:dd.Work quitely (silently), that is, display nothing except error messages.
+This is useful for checking the error status.
+:dt.-s
+:dd.Search subdirectories too for matching filenames to search in.
+:dt.-t
+:dd.Output the record starting from the end of delim to (and including) the next delim.
+This is useful for cases where delim should come at the end of the record.
+:dt.-v
+:dd.Inverse mode (display only those records that
+do not contain the pattern.)
+:dt.-w
+:dd.Search for the pattern as a word (i.e., surrounded by non-alphanumeric
+characters.  The non-alphanumeric must surround the match;  they cannot be
+counted as errors.
+For example,
+:xmp.
+ agrep -w -1 car
+:exmp.
+will match cars, but not characters.
+:dt.-x
+:dd.The pattern must match the whole line.
+:dt.-y
+:dd.Used with -B option. When -y is on, agrep will always
+output the best matches without giving a prompt.
+:dt.-B
+:dd.Best match mode.
+When -B is specified and no exact matches are found, agrep
+will continue to search until the closest matches (i.e., the ones
+with minimum number of errors)
+are found, at which point the following message will be shown:
+"the best match contains x errors, there are y matches, output them? (y/n)"
+The best match mode is not supported for standard input, e.g.,
+pipeline input.
+:p.When the -#, -c, or -l options are specified, the -B option is ignored.
+In general, -B may be slower than -#, but not by very much.
+:dt.-Di
+:dd.Set the cost of a deletion to i (i is a positive integer).
+This option does not currently work with regular expressions.
+:dt.-G
+:dd.Output the files that contain a match.
+:dt.-Ii
+:dd.Set the cost of an insertion to i (i is a positive integer).
+This option does not currently work with regular expressions.
+:dt.-Si
+:dd.Set the cost of a substitution to i (i is a positive integer).
+This option does not currently work with regular expressions.
+:edl.
+:p.PATTERNS
+:p.agrep supports a large variety of patterns, including simple
+strings, strings with classes of characters, sets of strings,
+wild cards, and regular expressions.
+:dl tsize=24.
+:dt.Strings
+:dd.any sequence of characters, including the special symbols
+'&caret.' for beginning of line and '$' for end of line.
+The special characters listed above ($, &caret., *, &lbrk.&rbrk., |, (), !,
+and \e) should be preceded by '\\' if they are to be matched as regular
+characters.  For example, \\&caret.abc\\\\
+corresponds to the string &caret.abc\\,
+whereas &caret.abc corresponds to the string abc at the beginning of a
+line.
+:dt.Classes of characters
+:dd.a list of characters inside &lbrk.&rbrk. (in order) corresponds to any
+character from the list.  For example,
+:xmp.
+&lbrk.a-ho-z&rbrk.
+:exmp.
+is any character between a and h
+or between o and z.  The symbol 'caret'
+inside &lbrk.&rbrk. complements the list.
+For example,
+:xmp.
+&lbrk.&caret.i-n&rbrk.
+:exmp.
+denote any character in the character set except
+character 'i' to 'n'.
+The symbol '&caret.' thus has two meanings, but this is consistent with
+egrep.
+The symbol '.' (don't care) stands for any symbol (except for the
+newline symbol).
+:dt.Boolean operations
+:dd.agrep supports an 'and' operation ';'
+and an 'or' operation ',', but not a combination of both.
+For example,
+:xmp.
+'fast;network'
+:exmp.
+searches
+for all records containing both words.
+:dt.Wild cards
+:dd.The symbol '#' is used to denote a wild card.  # matches zero or any
+number of arbitrary characters.  For example,
+:xmp.
+ex#e
+:exmp.matches example.  The symbol # is equivalent to .* in egrep.
+In fact, .* will work too, because it is a valid regular expression
+(see below), but unless this is part of an actual regular expression,
+# will work faster.
+:p.Combination of exact and approximate matching
+any pattern inside angle brackets <> must match the text exactly even
+if the match is with errors.  For example, <mathemat>ics matches
+mathematical with one error (replacing the last s with an a), but
+mathe<matics> does not match mathematical no matter how many errors we
+allow.
+:dt.Regular expressions
+:dd.The syntax of regular expressions in agrep is in general the same as
+that for egrep.  The union operation '|', Kleene closure '*',
+and parentheses () are all supported.
+Currently '+' is not supported.
+Regular expressions are currently limited to approximately 30
+characters (generally excluding meta characters).  Some options
+(-d, -w, -f, -t, -x, -D, -I, -S) do not
+currently work with regular expressions.
+The maximal number of errors for regular expressions that use '*'
+or '|' is 4.
+:edl.
+:p.EXAMPLES
+:ol.
+:li.
+:xmp.
+agrep -2 -c ABCDEFG foo
+:exmp.
+gives the number of lines in file foo that contain ABCDEFG
+within two errors.
+:li.
+:xmp.
+agrep -1 -D2 -S2 "ABCD#YZ" foo
+:exmp.
+outputs the lines containing ABCD followed, within arbitrary
+distance, by YZ, with up to one additional insertion
+(-D2 and -S2 make deletions and substitutions too "expensive").
+:li.
+:xmp.
+agrep -5 -p abcdefghij /usr/dict/words
+:exmp.
+outputs the list of all words containing at least 5 of the first 10
+letters of the alphabet in order.  (Try it:  any list starting
+with academia and ending with sacrilegious must mean something!)
+:li.
+:xmp.
+agrep -1 'abc&lbrk.0-9&rbrk.(de|fg)*&lbrk.x-z&rbrk.' foo
+:exmp.
+outputs the lines containing, within up to one error, the string
+that starts with abc followed by one digit, followed by zero or more
+repetitions of either de or fg, followed by either x, y, or z.
+:li.
+:xmp.
+agrep -d "&caret.From\ " "breakdown;internet" mbox
+:exmp.
+outputs all mail messages (the pattern '&caret.From\ ' separates mail messages
+in a mail file) that contain keywords 'breakdown' and 'internet'.
+:li.
+:xmp.
+agrep -d '$$' -1 '<word1> <word2>' foo
+:exmp.
+finds all paragraphs that contain word1 followed by word2 with one
+error in place of the blank.
+In particular, if word1 is the last word in a line and word2
+is the first word in the next line, then the space will be
+substituted by a newline symbol and it will match.
+Thus, this is a way to overcome separation by a newline.
+Note that -d '$$' (or another delim which spans more than one line)
+is necessary, because otherwise agrep searches
+only one line at a time.
+:li.
+:xmp.
+agrep "&caret.agrep" <this manual>
+:exmp.
+outputs all the examples of the use of agrep in this man pages.
+:eol.
+:p.BUGS/LIMITATIONS
+:p.Regular expressions do not support the '+' operator (match 1 or more
+instances of the preceding token).  These can be searched for by using
+this syntax in the pattern:
+:xmp.
+  pattern(pattern)*
+:exmp.
+(search for strings containing one instance of the pattern, followed by 0 or
+more instances of the pattern).
+:p. The following can cause an infinite loop:
+:xmp.
+ agrep pattern * > output_file
+:exmp.
+If the number of matches is high, they may be deposited in
+output_file before it is completely read leading to more matches of
+the pattern within output_file (the matches are against the whole
+directory).  It's not clear whether this is a "bug" (grep will do the
+same), but be warned.
+:p. The maximum size of the patternfile
+is limited to be 250Kb, and the maximum number of patterns
+is limited to be 30,000.
+:p.Standard input is the default if no input file is given.
+However, if standard input is keyed in directly (as opposed to through
+a pipe, for example) agrep may not work for some non-simple patterns.
+:p.There is no size limit for simple patterns.
+More complicated patterns are currently limited to approximately 30 characters.
+Lines are limited to 1024 characters.
+Records are limited to 48K, and may be truncated if they are larger
+than that.
+The limit of record length can be
+changed by modifying the parameter Max_record in agrep.h.
+:p.DIAGNOSTICS
+:p.Exit status is 0 if any matches are found,
+1 if none, 2 for syntax errors or inaccessible files.
+:p.AUTHORS
+:p.Sun Wu and Udi Manber, Department of Computer Science, University of
+Arizona, Tucson, AZ 85721.  {sw|udi}@cs.arizona.edu.
+:p.PORTED TO OS/2 BY
+:sl compact.
+:li.David Twyerould  VM&colon.SYDVM1(DTWY) Internet&colon. dtwyibm@vnet.ibm.com
+:li.PWS/OS2 Client/Server Application Development
+:li.Australian Programming Centre, Perth Australia (PE21)
+:li.Phone: 61-9-261-8454 or 61-9-222-3084
+:esl.
+:h2 id=at.at
+:p.at  --  Runs commands at a later time
+:p.Usage
+:xmp.
+    at  &lbrk.-c | -k | -s&rbrk. &lbrk.-m&rbrk. Time &lbrk.Today | Date&rbrk. &lbrk.Increment&rbrk. &lbrk.-l | -r job&rbrk.
+:exmp.
+:p.The at command reads from standard input the names of commands
+to be run at
+a later time and allows you to specify when the commands
+should be run.
+:p.The AIX at command mails you all output from standard output and
+standard error
+for the scheduled commands, unless you redirect that output.  It also
+writes the job number and the scheduled time to standard error.
+The OS/2 version, lacking an underlying mail system, puts the output
+in a directory called \at\output.  The jobs are listed by job number.
+:p.When the at command is executed, it retains the current process
+environment.  It does not retain open file descriptors, traps, and
+priority.
+:p.You can use the AIX at command if your name appears in the file
+/usr/adm/cron/at.allow.  If that file does not exist, the at command checks
+the file /usr/adm/cron/at.deny to determine if you should be denied access
+to the at command.  If neither file exists, only someone with root authority
+can submit a job.  The allow/deny files contain one user name per line.
+If (the at.allow file does exist, the root user's login nmae must be
+included in it for that person to be able to use the command.)
+In the OS/2 version, everyone has permission to use the at command
+:p.The required Time parameter can be one of the following:
+:ol.
+:li.A number followed by an optional suffix.  The at command
+interprets one- and two-digit numbers as hours.  It interprets
+four digits as hours and minutes.  The NLTIME environment
+variable specifies the order of hours and minutes.  The default order
+is the hour followed by the minute.  You can also separate hours and
+minutes with a &gml. (colon).  The default order is
+Hour&gml.Minute.
+:li.The at command also recognizes the following keywords as special
+Times:  noon, midnight, now, A for AM, P for PM, N for noon, and
+M for midnight.   Note that you can use the special word now only if
+you also specify a Date or an Increment.  Otherwise, the at command
+tells you: too late.  The NLTSTRS environment variable controls the
+additional keywords that the at command recognizes.
+:eol.
+:p.You may specify the Date parameter as either a month name and a
+day number
+(and possibly a year number preceded by a comma), or a day of the
+week.
+The NLDATE environment variable specifies the order of the month name
+and day number (by default, month followed by day).  The NLLDAY
+environment
+variable specifies long day names; NLSDAY and NLSMONTH specify
+short day
+and month names.   (By default, the long name is fully spelled out;
+the
+short name is abbreviated to two or more characters for weekdays, and
+three characters for months).  The at command recognizes two special
+"days", today and tomorrow by default.  (The NLSTRS environment
+variable
+specifies these special days.)  today is the default Date if the
+specified
+time is later than the current hour; tomorrow is the default if the
+time is
+earlier than the current hour.  If the specified month is less than
+the
+current month (and a year is not given), next year is the default
+year.
+The optional Increment can be one of the following:
+:ol.
+:li.A + (plus sign) followed by a number and one of the following
+words: minute&lbrk.s&rbrk., hour&lbrk.s&rbrk.,
+day&lbrk.s&rbrk., week&lbrk.s&rbrk., month&lbrk.s&rbrk.,
+year&lbrk.s&rbrk. (or
+their non-English equivalents).
+:li.The special word next followed by one of the following words:
+minute&lbrk.s&rbrk., hour&lbrk.s&rbrk., day&lbrk.s&rbrk.,
+week&lbrk.s&rbrk., month&lbrk.s&rbrk., year&lbrk.s&rbrk.
+(or
+their non-English equivalents).
+:eol.
+:p.FLAGS
+:dl tsize=10.
+:dt.-c
+:dd.Requests that the csh command be used for executing this job.
+(Not currently implemented in the OS2 version.  CMD.EXE is the shell
+used in all cases.  This flag, as well as the -k and -s flags, are
+accepted but not used.)
+:dt.-k
+:dd.Requests that the ksh command be used for executing this job.
+:dt.-l
+:dd.Reports your scheduled jobs
+:dt.-m
+:dd.Mails a message to the user about the successful completion
+of the command.  (This flag is accepted but has no effect in the
+OS/2 version.)
+:dt.-r Job
+:dd.Removes Jobs previously scheduled by the at or batch commands,
+where job is the number assigned by the at or batch
+commands.
+In the AIX at, if you do not have root user authority (see the su
+command), you
+can only remove your own jobs.  The atrm command is
+available
+to the root user to remove jobs issued by other users or
+all
+jobs issued by a specific user.
+The OS/2 version allows anyone to remove any job.
+:dt.-s
+:dd.Requests the bsh command (Bourne shell) be used for executing
+this job.  (Not currently implemented in the OS/2 version.)
+:edl.
+:p.EXAMPLES
+:ol.
+:li.To schedule the command from the terminal, enter a command
+similar
+to one of the following:
+:xmp.
+               at 5 pm Friday uuclean
+               Ctrl-Z
+:exmp.
+:note.In the OS/2 at command, as well as in most of the other
+programs in the AIXLIKE package, ctrl-D is not supported as a
+termination signal.  In the case of the OS/2 at command, ctrl-Z
+is required to indicate the end of input.
+:xmp.
+               at now next week uuclean
+               Ctrl-Z
+ 
+               at now + 2 days uuclean
+               Ctrl-Z
+ 
+               at now + 2 days
+               uuclean
+               Ctrl-Z
+:exmp.
+:li.To run the uuclean command at 3&colon.00 in the afternoon on the 24th
+of January, enter any one of the following commands:
+:xmp.
+               echo uuclean | at 3&colon.00 pm January 24
+ 
+               echo uuclean | at 3pm Jan 24
+ 
+               echo uuclean | at 1500 jan 24
+:exmp.
+:li.To have a job reschedule itself, invoke the at command from
+within
+the shell by including code similar to the following within
+the command file:
+:xmp.
+               echo "cmdfile" | at now tomorrow
+:exmp.
+:li.To list the jobs you have sent to be run later, enter:
+:xmp.
+               at -l
+:exmp.
+:li.To cancel a job, enter:
+:xmp.
+               at -r 63567720.026
+:exmp.
+:p.This cancels job 63567720.026.  Use the at -l command to
+list
+the job numbers assigned to your jobs.
+:eol.
+:p.OS/2 SPECIFICS
+:sl.
+:li.The OS/2 implementation has two programs: at.exe and atd.exe.
+The first is loaded each time you invoke the at command.  The second
+is a daemon that is invoked by the at command (if it is not already
+loaded) and remains loaded until there is no more scheduled work.
+:li.For the at command to work correctly after a system restart, you
+must load atd.exe during the startup procedure.  (If there is no
+scheduled work, it quietly goes away.)  A good way to do this is
+to put the line
+:xmp.
+           atd
+:exmp.
+in your STARTUP.CMD file.  (Add a path if necessary).
+:li.The daemon, atd, has an associated icon.  Put the icon file (atd.ico
+in the same directory as atd, or in a directory on your DPATH.
+:li.The at function creates (if they don't already exist), three
+directories.  By default, the directories are
+:sl compact.
+:li.C:\at  --  usually empty except for its subdirectories
+:li.C:\at\jobs  --  where queued jobs are stored
+:li.C:\at\output  --  where the output of executed jobs is stored
+:esl.
+:p.
+You have control over the directory names.  Use the ATJOBS environment
+variable to select the directory in which queued jobs are stored.
+Output will be stored in a parallel directory named output.
+:li.Output will accumulate in the at\out subdirectory.  Periodically
+(perhaps as scheduled by at itself) you should clean it out.
+:esl.
+:h2 id=atob.atob, btoa
+:p.btoa: converts a binary file to an ascii format suitable for
+mailing.
+:p.atob: restores the original binary file
+:p.Both these programs are filters.  They read from stdin and write
+to stdout.  To use them, redirect the output as required.  For example,
+to create a mailable ascii file from the file prog.exe, do something
+like
+:xmp.
+   btoa <prog.exe >progexe.asc
+:exmp.
+:p.To restore the original binary file, do something like
+:xmp.
+   atob <progexe.asc >prog.exe
+:exmp.
+:p.btoa encoding is more efficient, but less common than uuencoding
+(see :hp2.uuencode:ehp2. below).  btoa encoding results in a file that
+is approximately 25% larger than the source binary file (usually
+slightly less than 25%; sometimes slightly more).  uuencoding results
+in a file that is 33% larger than the original binary file.
+Nevertheless, if you want to make sure the receiver can decode the
+material you send, you are better off uuencoding.
+:h2 id=compre.compress, uncompress, or zcat
+:p.compress: compress and expand data
+:p.Syntax
+:xmp.
+   compress &lbrk.-d -f -v -c -b Bits&rbrk. Name &lbrk.Name...
+ 
+   uncompress &lbrk.-f -c -v&rbrk. Name &lbrk.Name...
+ 
+   zcat Name &lbrk.Name...
+:exmp.
+:p.The compress command reduces the size of the named files using
+adaptive Lempel-Ziv coding.  Whenever possible, each file is replaced
+by one with the extension .Z while keeping the same ownership modes,
+access and modification times.  Compressed files can be restored to
+their original form using the uncompress or zcat command.
+:p.The compress command uses the modified Lempel-Ziv algorithm
+popularized in :cit.A Technique for High Performance Data Compression
+:ecit., Terry A. Welch, :hp1.IEEE Computer:ehp1., Vo. 17, no. 6
+(June, 1984), pp. 8-19.
+:p.The amount of compression obtained depends on the size of the input,
+the number of Bits per code, and the distribution of common substrings.
+:p.Flags
+:dl tsize=10.
+:dt.-d
+:dd.Causes the compress command to uncompress Name.
+:dt.-f
+:dd.Forces compression of Name even if it does not actually shrink or
+the corresponding Name file already exists.  If -f is not given, the
+user is prompted as to whether an existing Name file should be
+overwritten.
+:dt.-c
+:dd.Makes the compress or uncompress command write to the standard
+output; no files are changed.  The non-destructive behavior of the
+acat command is identical to that of the uncompress -c command.
+:dt.-b Bits
+:dd.Specified the maximum number of Bits to use to replace common
+substrings in the file.  The default for Bits is 16, with values of
+9 through 16 acceptable.  First, the algorithm uses 9-bit codes
+2257 thru 512.  Then it uses 10-bit codes, continuing until the limit
+specified by the -b flag is reached.  The -b flag is not permitted
+with the uncompress command.
+:p.After the Bits limit is attained, the compress command periodically
+checks the compression ratio.  If it is increasing, the compress
+command continues to use the existing code dictionary.  However, if
+the compression ratio decreases, the compress command discards the
+table of substrings and rebuilds it from scratch.  This allows the
+algorithm to adapt to the next block of the file.
+:dt.-v
+:dd.Causes the percentage reduction of each file to print.
+:edl.
+:p.The logic for all three commands is in module compress.exe.
+If you want to have OS/2 versions of uncompress and zcat, simply
+copy compress.exe to uncompress.exe (on HPFS) or uncompre.exe (on FAT);
+and to zcat.exe.
+:h2 id=cut.cut
+:p.The cut command writes out selected fields from each line of a file.
+:p.Usage
+:xmp.
+        cut -cList or -fList -dCharacter -s [file [file ...
+:exmp.
+:p.The default "Character" is tab.
+:p.The
+cut command cuts columns from a table or fields from each line of a file,
+and writes these columns or fields to standard output.  If you do not
+specify a file name, the cut command reads standard input.
+:p.You
+must specify either the -c or -f flag.  The List parameter is a comma-
+separated and/or minus-separated list of integer field numbers (in
+increasing order).  The minus separator indicates ranges.  Some sample
+List parameters are
+:sl compact.
+:li.1,4,7
+:li.1-3,8
+:li.-5,10   (short for 1-5,10)
+:li.3-      (short for 3 to the last field)
+:esl.
+:p.The
+fields specified the by the List parameter can be a fixed number of
+character positions, or the length can vary from line to line and be marked
+with a field delimiter character, such as a tab character.
+:p.You
+can also use the grep command to make horizontal cuts through the file
+and the paste commands to put the files back together.  To change the order
+of columns in a file use the cut and paste commands.
+:p.Flags
+:dl tsize=16.
+:dt.-c:hp1.List:ehp1.
+:dd.Specifies character positions.  For example, if you
+specify -c1-72, the cut command writes out the first
+72 characters in each line of the file.  Note that
+there is no space between -c and the List parameter.
+:dt.-d:hp1.Character:ehp1.
+:dd.Uses the character specified by the Character parameter
+as the field delimiter when you specify the -f flag.
+You must put quotation marks around characters
+with special meaning to the shell, such as the space
+character.
+:dt.-f:hp1.List:ehp1.
+:dd.Specifies a list of fields assumed to be separated
+in the file by a delimiter character, which is by
+default the tab character.  For example, if you
+specify -f1,7, the cut command writes out only the
+first and seventh fields of each line.  If a line
+contains no field delimiters, the cut command passes
+them through intact (useful for table subheadings),
+unless you specify the -s flag.
+:dt.-s
+:dd.Suppresses lines that do not contain delimiter
+characters (use only with the -f flag).
+:edl.
+:h2 id=df.df
+:p.df: Reports information about space on file systems
+:p.Usage
+:xmp.
+     df &lbrk.-l|-M|-i|-s|-v&lbrk. &rbrk.FileSystem FileSystem... | File File...&rbrk.
+        \              / \                                      /
+         \            /   \                                    /
+          \..one of../     \................one of............/
+:exmp.
+:p.
+The df command displays information about total space and available space on
+a file system.  The FileSystem parameter specified the name of the device on
+which the file system resides (the drive letter, under OS/2); in UNIX it
+can also be the relative path name of a file system.  If you do not specify
+the FileSystem parameter, the df command displays information for all mounted
+file systems.  If a file or directory is specified, then the df command
+displays information for the file system on which the file resides.
+:p.
+If the file system is being actively modified when the df command is run,
+the free count may not be accurate.
+:p.
+The FileSystem specifications, if given, must be in the form
+:xmp.
+       d:
+:exmp.
+where d is the drive letter on which the file system is mounted.
+:p.
+The File specifications, if given, are relative to the current working
+directory.
+:p.
+Flags
+:dl tsize=10.
+:dt.-i
+:dd.Specified that the number of free and used i-nodes for the file
+system is displayed; this is the default when the specified
+file
+system is mounted. This flag is accepted but ignored for OS/2.
+:dt.-l
+:dd.Specified that information on total K bytes, used space, free space,
+percentage of used space, and mount point for the file system
+is displayed.
+:dt.-M
+:dd.Specifies that the mount point information for the file system is
+displayed in the second column.
+:dt.-s
+:dd.Specifies a full search of the free block list.  This flag is
+accepted but ignored for OS/2.
+:dt.-v
+:dd.Specifies that all information for the specified file system
+is displayed.  Same as -l.
+:edl.
+:h2.du
+:p.du -- summarizes disk usage.
+:p.Syntax:
+:xmp.
+      du &lbrk.-lrs&rbrk. &lbrk.-a&rbrk. &lbrk.-b&rbrk. File or Directory ...
+:exmp.
+:p.The du command displays the number of bytes for all files and
+directories specified by the File and Directory parameters, and
+recursively, for all directories within the specified Directory
+Parameter.  By specifying the -a flag, you can also have the du command
+report the number of bytes in individual files.  The byte count
+includes all space allocated for the file (including unused space), and
+will usually be a larger number than is shown by the OS/2 dir command.
+:p.The AIX implementation reports space in 1024-byte blocks.  The OS/2
+version reports bytes unless you specify the -b flag, which forces
+reporting to 1024-byte blocks.  Not that many devices have an allocation
+unit smaller than 1024, however, so rounding errors may occur, and
+a list of modules may not add up to the correct total of blocks.
+:p.NOTES:
+:ol.
+:li.If the -a flag is not specified, the du command does not report on
+any individual files.
+:eol.
+:p.FLAGS:
+:dl tsize=10.
+:dt.-a
+:dd.Displays disk use for each file
+:dt.-b
+:dd.(OS/2 only) displays usage in 1024-byte blocks.  If this
+flag is not used, usage is displayed in bytes.
+:dt.-l
+:dd.Allocates blocks evenly over links.  Has no effect under
+OS/2.
+:dt.-r
+:dd.Indicates inaccessible files and directories.
+:dt.-s
+:dd.Displays only the total sum (for each of the specified
+files or directories given).
+:edl.
+:p.EXAMPLES:
+:ol.
+:li.To summarize the disk usage of a directory tree and each of its
+subtrees, enter
+:xmp.
+      du \u\fran
+:exmp.
+:p.This displays the number of bytes in the \u\fran directory and each
+of its subdirectories.
+:li.To display the disk usage of each file, enter:
+:xmp.
+      du -a \u\fran
+:exmp.
+:p.This displays the bytes contained in each file and subdirectory of
+the
+\u\fran directory.  The number beside a directory is the disk usage of
+that directory tree.  The number beside a regular file is the disk usage
+of that file alone.
+:li.To display only the total disk usage of a directory tree, enter:
+:xmp.
+      du -rs \u\fran
+:exmp.
+:p.This displays only the sum total disk usage of the \u\fran directory
+and
+the files it contains.  Specify the -s flag.  The -r flag tells the du
+command to display an error message if it cannot read a file or
+directory.
+:eol.
+:h2.fgrep
+:p.fgrep -- searches a file for a pattern.
+:p.Usage:
+:xmp.
+          fgrep &lbrk.-v&rbrk.&lbrk.-x&rbrk.&lbrk.-h&rbrk.&lbrk.-s&rbrk.&lbrk.-i&rbrk. &lbrk.-c | -l&rbrk. &lbrk.-b | -n&rbrk.
+                &lbrk.Pattern | -e Pattern | -f StringFile&rbrk. File &lbrk.File...
+:exmp.
+:p.The fgrep command searches the input files specified by the :hp1.File:ehp1.
+parameter
+(standard input by default) for lines matching a pattern.  The fgrep command
+searches specifically for :hp1.Pattern:ehp1. parameters that are fixed strings.
+The
+fgrep command displays the name of the file containing the matched line
+if you specify
+more
+than one file in the :hp1.File:ehp1. parameter.
+The exit values of this command are:
+:dl tsize = 5.
+:dt.0 :dd.A match was found
+:dt.1 :dd.No match was found
+:dt.2 :dd.A syntax error was found or a file was inaccessible (even
+if matches were found).
+:edl.
+:p.
+Flags:
+:dl tsize=24.
+:dt.-b
+:dd.Precedes each line by the block number on which it was
+found. Use this flag to help find disk block numbers
+by context. (In this implementation the relative allocation
+unit number is shown);
+:dt.-c
+:dd.Displays only a count of matching lines.
+:dt.-e Pattern
+:dd.Specifies a pattern.  This works the same as a simple
+pattern, but is useful when a pattern begins with a -.
+:dt.-f StringFile
+:dd.Specifies a file that contains strings to be matched.
+(The file may specify up to 256 strings in this OS/2
+implementation).
+:dt.-h
+:dd.Suppresses file names when multiple files are being processed.
+:dt.-i
+:dd.Ignores the case of letters when making comparisons.
+:dt.-l
+:dd.Lists just the names of files (once) with matching lines.  Each file
+name is separated by a new-line character.
+:dt.-n
+:dd.Precedes each line with its relative line number in the file.
+:dt.-s
+:dd.Search all subdirectories below the specified path (OS/2 only).
+NOTE:  in the AIX implementation, the -s switch indicates that no search
+results should be printed and that only error messages should be displayed.
+For consistency, I have chosen to override this not-all-that-useful switch.
+:dt.-v
+:dd.Displays all lines except those that match the specified pattern.
+:dt.-x
+:dd.Displays lines that match the pattern exactly with no additional characters.
+:dt.-y
+:dd.Ignore case of letters when making comparisons
+:edl.
+:h2.find
+:p.find -- finds files with a matching expression.
+:p.The find command recursively searches the directory tree for each specified
+path seeking files that match a Boolean Expression written using the terms
+given below.  The output from the find command depends on the terms
+used in Expression.
+:xmp.
+        find   Path &lbrk.Path ...&rbrk. Expression
+:exmp.
+Note:  In the following descriptions, the parameter Number is a decimal
+integer that can be specified as +Number (more than Number), -Number
+(less than Number), or Number (exactly Number).
+:dl tsize=28.
+:dt.-fstype Type
+:dd.True if the file system to which the file
+belongs is of the type Type, where Type is
+jfs (journaled file system) or nfs (networked
+file system).
+:p.In OS/2, ALWAYS TRUE.
+:dt.-inum Number
+:dd.True if the i-node is Number.  In OS/2, ALWAYS TRUE.
+:dt.-name FileName
+:dd.True if FileName matches the file name.  You
+can use pattern-matching characters, provided they are quoted.
+:dt.-perm OctalNumber
+:dd.In OS/2, ALWAYS TRUE.
+:dt.-prune
+:dd.In OS/2, ALWAYS TRUE.
+:dt.-type Type
+:dd.True if the file Type is of the specified type, as follows:
+:dl tsize = 4.
+:dt.b
+:dd.Block special file (In OS/2, ALWAYS FALSE)
+:dt.c
+:dd.Character file     (In OS/2, ALWAYS FLASE)
+:dt.d
+:dd.Directory
+:dt.f
+:dd.Plain file
+:dt.p
+:dd.FIFO (a named pipe)
+:dt.l
+:dd.Symbolic link      (In OS/2, ALWAYS FALSE)
+:dt.s
+:dd.Socket
+:edl.
+:dt.-links Number
+:dd.True if the file has Number links. In OS/2, ALWAYS FALSE.
+:dt.-user UserName
+:dd.True if the file belongs to user UserName. In OS/2, ALWAYS TRUE.
+:dt.-group GroupName
+:dd.True if the file belongs to group GroupName. In OS/2, ALWAYS TRUE.
+:dt.-nogroup
+:dd.True if the file belongs to no groups.  In OS/2, ALWAYS TRUE.
+:dt.-size Number
+:dd.True if the file is Number blocks long (512 bytes
+per block).  For this comparison, the file size
+is rounded up to the next higher block.
+:dt.-atime Number
+:dd.True if the file has been accessed in Number days.
+:dt.-mtime Number
+:dd.True if the file has been modified in Number days.
+:dt.-ctime Number
+:dd.True if the file has been changed in Number days.
+:dt.-exec Command
+:dd.True if the Command runs and returns 0.  The end
+of Command must be punctuated by a quoted or
+escaped semicolon.  A command parameter of {} is
+replaced by the current path name.
+:dt.-ok Command
+:dd.The find command asks you whether it should start
+Command.  If your response begins with Y (upper or lower case), Command
+is started.  The end of Command must be punctuated
+by a quoted or escaped semicolon.
+:dt.-print
+:dd.Always true; causes the current path name to be
+displayed.  The find command does not display path
+names unless you specify this expression term.
+:dt.-cpio Device
+:dd.Write the current file to Device in the cpio
+command format.  Always fails in OS/2.
+:dt.-newer File
+:dd.True if the current file has been modified more
+recently than the file indicated by File.
+:dt.-\( Expression \)
+:dd.True if the expression in parentheses is true.
+:dt.-depth
+:dd.Always true.  Supposed to cause the descent of
+the directory hierarchy to be done so that all
+entries in a directory are affected before the
+directory itself.  This can be useful when the
+find command is used with the cpio command to
+transfer files that are contained in directories
+without write permission.
+:p.Does nothing at all in OS/2.
+:dt.-ls
+:dd.Always true;  prints more path information.
+:dt.-xdev
+:dd.Always true;  no effect in OS/2.
+:dt.-o
+:dd.logical or.  (Juxtaposition of two terms without -o implies a logical and.)
+:dt.!
+:dd.Negation of an expression term
+:edl.
+:h2.grep
+:p.grep -- searches a file for a pattern.
+:p.Usage:
+:xmp.
+          grep &lbrk.-i&rbrk.&lbrk.-w&rbrk.&lbrk.-y&rbrk.&lbrk.-q&rbrk.&lbrk.-s&rbrk.&lbrk.v&rbrk.&lbrk.-pSeperator &lbrk.-c | -l&rbrk. &lbrk.-b | -n&rbrk.
+                &lbrk.Pattern | -e Pattern | File &lbrk.File...
+:exmp.
+:p.The grep command searches for the pattern specified by the Pattern parameter
+and writes each matching line to standard output.  The patterns are limited
+regular expressions in the style of the ed command.
+:p.The grep command displays the name of the file containing the matched line if
+you specify more than one name in the File parameter.  Characters with special
+meaning to the OS2 shell must be quoted when they appear in the Pattern
+parameter.  When the Pattern parameter is not a simple string, you usually
+must enclose the entire pattern in double quotation marks.  In an expression
+such as &lbrk.a-z&rbrk., the minus means through according to the current
+collating sequence.  A collating sequence may define equivalence classes for
+use in the character ranges.  The exit values of this command are:
+:dl tsize=5.
+:dt.0
+:dd.A match was found
+:dt.1
+:dd.No match was found
+:dt.2
+:dd.A syntax error was found or a file was inaccessible (even if matches were
+found).
+:edl.
+:p.Notes:
+:ol.
+:li.Lines are limited to 512 characters; longer lines are broken into
+multiple lines of 512 or fewer characters.
+:li.Paragraphs (under the -p flag) are currently limited to a length of 5000
+characters.
+:eol.
+:p.Flags:
+:dl tsize=20
+:dt.-b
+:dd.Precedes each line by the block number on which it was
+found. Use this flag to help find disk block numbers
+by context. (In this implementation the relative allocation
+unit number is shown);
+:dt.-c
+:dd.Displays only a count of matching lines.
+:dt.-e Pattern
+:dd.Specifies a pattern.  This works the same as a simple
+pattern, but is useful when a pattern begins with a -.
+:dt.-i
+:dd.Ignores the case of letters when making comparisons.
+:dt.-l
+:dd.Lists just the names of files (once) with matching
+lines.  Each file name is separated by a new-line
+character.
+:dt.-n
+:dd.Precedes each line with its relative line number in the file.
+:dt.-pSeparator
+:dd.Displays the entire paragraph containing matched lines.
+Paragraphs are delimited by paragraph separators, as
+specified by the Separator parameter, which is a pattern
+in the same form as the search pattern.  Lines containing
+the paragraph separators are used only as separators; they
+are never included in the output.  The default paragraph
+separator is a blank line.
+:dt.-q
+:dd.Suppresses error messages about files that are not accessible.
+:dt.-s
+:dd.Search all subdirectories below the specified path.
+NOTE:  in the AIX implementation, the -s switch indicates that no search
+results should be printed and that only error messages should be displayed.
+For consistency, I have chosen to override this not-all-that-useful switch.
+:dt.-v
+:dd.Displays all lines except those that match the specified pattern.
+:dt.-w
+:dd.Does a word search.
+:dt.-y
+:dd.Ignore case of letters when making comparisons
+:edl.
+:p.This OS/2 implementation is slower than Ralph Yozzo's implementation
+available in the GREP package on PCTOOLS.  If you have a lot of grepping
+to do, you might want to use Ralph's.  On the other hand, this
+implementation retains the traditional behavior of the utility,
+and may act more like you expect.  This version also supports
+ed-type general expressions, including
+subpatterns and recursion operators, which Ralph's does not.
+:h2.head
+:p.Head -- displays the first few lines of a file or files.
+:p.Usage
+:xmp.
+       head &lbrk.-Count&rbrk. &lbrk.File &lbrk.File &ellip.
+:exmp.
+:p.where
+:dl tsize=15.
+:dt.Count
+:dd.Specifies the number of lines of each of the specified files
+to be displayed.
+:dt.File
+:dd.Specifies 0 or more file specs.  The default in stdin.
+:edl.
+:h2.kill
+:p.Kill -- sends a signal to a running process
+:p.Usage
+:xmp.
+       kill &lbrk.-l&rbrk. or &lbrk.-Signal&rbrk. pid
+                 or
+       kill 0 or -1
+:exmp.
+:p.The kill command sends a signal (by default, the KillProcess signal) to a
+running process which you specify by process ID (pid).  This default action
+normally stops processes that ignore or do not catch the signal.  The OS/2
+command PSTAT reports process
+IDs.
+You can also use the AIXLIKE ps command to find the process ID number of
+commands.
+:p.If you are not a root user, you must own the process you want to stop.
+When operating as a root user, you can stop any process.  In OS/2 you are
+:hp1.always:ehp1. the root user.
+:p.Flags
+:dl tsize=22.
+:dt.0
+:dd.In AIX, sends the signal to all processes having a PID equal to the PID
+of the sender (except those with PIDs 0 and 1).  In OS/2 it does nothing at
+all.
+:dt.-1
+:dd.In Aix, sends the signal to all processes with a PID equal to the effective
+user ID of the sender (except to 0 and 1).  In OS/2 it does nothing at all.
+:dt.ProcessID
+:dd.Sends the signal to all processes whose process-group
+number is equal to the absolute value of the ProcessID
+:dt.-l
+:dd.Lists supported signal names and numbers:
+:sl compact.
+:li.KillProcess
+:li.SIGBREAK
+:li.SIGINTR
+:li.SIGUSER1
+:li.SIGUSER2
+:li.SIGUSER3
+:esl.
+:dt.-Signal
+:dd.The signal can be the signal number or the signal name.
+:edl.
+:p.NOTE:  This has not been well-exercised on OS/2 version 2.0.  I suspect
+it may have problems.
+:h2.more
+:p.more or page -- Displays continuous text one screen at a time on a
+display screen.
+:p.Usage
+:xmp.
+         more -cdflsu -n +Number    File &lbrk.File ...
+          or                or
+         page            +/Pattern
+:exmp.
+:p.The more command displays continuous text one screen at a time. It pauses
+after each screen and prints the word More at the bottom of the screen.
+If (you then press a carriage return, the more command displays an
+additional line.  If you press the space bar, the more command displays
+another screen of text.
+NOTE:
+:sl.
+:li.The OS/2 version does not support differences between the 'page' and
+'more' commands.  If you want a 'page', just rename 'more'.
+:li.Only attached OS/2 displays have been tested.  You may have trouble
+with an attached ascii terminal or with telnet.  If you do, please report
+it.
+:esl.
+:p.Flags:
+:dl tsize=12.
+:dt.-c
+:dd.Keeps the screen from scrolling and makes it easier to
+read text while the more command is writing to the
+terminal.  The -c flag is ignored if the terminal does
+not have the ability to clear to the end of a line.
+:p.
+Under OS/2, this option is :hp1.much:ehp1. faster than the scrolling case.
+:dt.-d
+:dd.Prompts the user to continue, quit, or obtain help.
+:dt.-f
+:dd.Causes the more command to count logical lines, rather
+than screen lines.  The -f flag is recommended if the nroff
+command is being piped through the ul command.
+:dt.-l
+:dd.Does not treat control-L (form feed) in a special manner.
+If the -l flag is not supplied, the more command pauses
+after any line that contains a control-L, as though a full
+screen of text has been reached.  If a file begins with a form
+feed, the screen is cleared before the file is printed.
+:dt.-n
+:dd.(Where n is an integer) specified the number of lines in
+the window.  If the -n flag is specified, the more command
+does not use the default number.
+:dt.-s
+:dd.Squeezes multiple blank lines from the output to produce only
+one blank line.  The -s flag is particularly helpful when
+viewing output from the nroff command.  This flag maximizes
+the useful information present on the screen.
+:p.Not implemented for OS/2 yet.
+:dt.-u
+:dd.Suppresses the more command from underlining or creating
+stand-out mode for underlined information in a source file.
+:dt.+Number
+:dd.Starts at the specified line Number.
+:dt.+/Pattern
+:dd.Starts two lines before the line containing the regular
+expression Pattern.
+:edl.
+:p.In AIX, the more command uses the file /etc/terminfo to determine
+terminal characteristics and to determine the default window size; in
+OS/2, I haven't figured out how to do it yet, except in the locally attached
+case.
+On a terminal capable of
+displaying 24 lines, the default window size is 22 lines.
+If the more command is reading from a file rather than a pipe, it displays
+a percent sign (%) with the more command prompt.  This provides the fraction
+of the file (in characters, not lines) that the more command has read.
+The page command is equivalent to the more command.
+:p.Command Sequences:
+:p. Other command sequences that can be entered when the more command
+pauses are as follows ( | is an optional integer option, defaulting
+to 1):
+:dl tsize=12.
+:dt.|<space>
+:dd.Displays / more lines (or another screen full of text
+if no option is given).
+:dt.ctrl-D
+:dd.Displays 11 more lines (a "scroll").  If i is given,
+the scroll size is set to i/.   Same as d.
+:dt.d
+:dd.Displays 11 more lines (a "Scroll").  Same as ctrl-D.
+:dt..|z
+:dd.Same as typing a space except that if | is present, it
+becomes the new window size.
+:dt.|s
+:dd.Skips | lines and prints a full screen of lines.
+:dt.|f
+:dd.Skips | screens and prints a full screen of lines
+:dt.|b
+:dd.Skips back I screens and prints a full screen of lines
+:dt.|ctrl-B
+:dd.Skips back / screens and prints a full screen of lines.
+:dt.q or Q
+:dd.Exits from more command.
+:dt.=
+:dd.Displays the current line number
+:dt.v
+:dd.Invokes vi editor <Not implemented in OS/2 version >
+:dt.h
+:dd.This is the help command.  Provides a description for
+all the more commands.
+:dt.|/expr
+:dd.Searches for the |-th occurrence of the regular expression
+Expression.  If there are less than | occurrences of
+Expression/, and the input is a file (rather than a pipe),
+the position in the file remains unchanged.  Otherwise,
+a full screen is displayed, starting two lines prior to the
+location of the expression.
+:dt.|n
+:dd.Searches for the |th occurrence of the last regular
+expression entered.  Goes to the point from which the
+last search started.  If a search has not been performed
+in the current file, this sequence causes the more
+command to go to the beginning of the file.
+:dt.!command
+:dd.Invokes a shell.  The characters '%' and '!' in the
+command sequence replaced with the current file name
+and the previous shell command respectively.  If there
+is no current file name, '%' is not expanded.  The
+sequences "\%" and "\!" are replaced by"%" and "!"
+respectively.
+:dt.i&colon.n
+:dd.Skips to the I/th next file given in the command line.
+If n is not valid, skips to the last file.
+:dt..i&colon.p
+:dd.Skips to the I/th previous file given in the command line.
+If this sequence is entered while the more command is in
+the middle of printing a file, the more command goes back
+to the beginning of the file.
+:dt.&colon.f
+:dd.Displays the current file name and line number.
+:dt.&colon.q or &colon.Q
+:dd.Exits (same as q or Q).
+:dt.. (dot)
+:dd.Repeats the previous command.
+:edl.
+:p.When any of the command sequences are entered, they begin to process
+immediately.  It is not necessary to type a carriage return.
+:p.The more command sets terminals to Noecho mode.  This enables the output to
+be continuous and only displays the / and ! command on your terminal
+as your type.  If the standard output is not a terminal, the more command
+processes like the cat command.  However, it prints a header before each
+file (if there is more than one file).
+:p.NOTE:  This has not been well-exercised on OS/2 version 2.0.  I suspect
+it may have problems.
+:p.Implementation Notes
+:ul.
+:li.I've decided to set a maximum number of files at 64.  I won't
+even try to process more than that.
+:li.I'm going to use VIO for video output.
+:eul.
+:h2.paste
+:p.The
+paste command merges the lines of several files or subsequent lines
+in one file.
+:p.Usage
+:xmp.
+     paste -dList -s File1 [File2 [File3...
+:exmp.
+:p.The
+paste command reads input frm the files specified by the file1 and
+file2 parameters (standard input if you specify a - as a file name),
+concatenates the corresponding lines of the given input files, and writes
+the resulting lines to standard output.  Output lines are restricted to
+511 characters.
+:p.By
+default, the paste command treats each file as a column and joins them
+horizontally with a tab character (parallel merging).  You can think of
+paste as the counterpart of the cat command (which concatenates files
+vertically, that is, one file after another).
+:p.With
+the -s flag, the paste command combines subsequent lines of an input
+file (serial merging).  These lines are joined with the tab character by
+default.
+:p.Flags:
+:dl tsize=10.
+:dt.-d:hp1.List:ehp1.
+:dd.changes the delimiter that separates corresponding lines
+in the output with one or more characters specified in
+the List parameter, then they are repeated in order until
+the end of the output.  In parallel merging, the lines
+from the last file always end with a new-line character,
+instead of one from the List parameter.
+:p.The following special characters can also be used in the
+List parameter:
+:dl tsize=5.
+:dt.\n
+:dd.New-line character
+:dt.\t
+:dd.Tab
+:dt.\\
+:dd.Backslash
+:dt.\0
+:dd.Empty string (not a NULL)
+:edl.
+:p.You must put quotation marks around characters that
+have special meaning to the shell.
+:dt.-s
+:dd.Merges subsequent lines from the first file horizontally.
+With this flag, paste works through one entire file before
+starting on the next.  When it finishes merging
+the lines in one file, it forces a new line and then
+merges the lines in the next input file, continuing in
+the same way through the remaining input files, one at a
+time.  A tab separates the lines unless you use the -d
+flag.  Regardless of the List parameter, the last
+character of the file is forced to be a new-line character.
+:edl.
+:h2.printenv
+:p.printenv -- Displays the values of the variables in the environment.
+:p.Syntax
+:xmp.
+           printenv &lbrk.name &lbrk.name ...
+:exmp.
+:p.The printenv command displays the values of the variables in the
+environment.  If a Name is specified, only its value is printed.
+If a Name is not specified, the printenv command displays the
+current environment, one Name=Value per line.
+:p.
+If a Name is specified and it is not defined in the environment,
+the printenv command returns exit status 1, else it returns status 0.
+:h2.ps
+:p.The OS/2 process model is so different, it's amazing that you get
+anything at all when you enter ps.  What you do see has no relation whatever
+to what you get from the AIX version.
+:p.You can put anything on the command line.  Anything but -? or
+-help will be ignored.
+:p.The following fields are displayed:
+:dl tsize=16.
+:dthd.Heading
+:ddhd.Content
+:dt.PID    :dd.Process ID
+:dt.PPID   :dd.Parent's Process ID
+:dt.SID    :dd.Session ID
+:dt.MHNDL  :dd.Module handle
+:dt.THRDS  :dd.Number of threads
+:dt.MODS   :dd.Number of module entries
+:dt.SEMS   :dd.Number of System Semaphores
+:dt.SSEG   :dd.Number of Shared Segments
+:dt.COMMAND:dd.'Name' field from def file
+:edl.
+.*:p.The ps command will fail with a version check message on OS/2 version 2.
+.*There is a new API, Dos32QuerySysStat, in version 2.0 that appears to
+.*provide the same kinds of information as the old, undocumented
+.*DosQProcStat call in version 1.x, but I haven't figured out how to use
+.*it yet.
+:rev refid=330.
+:p.The ps command is now a 32-bit program, and will no longer run under OS/2
+1.3.  It is built as a mixed-mode application, still using the undocumented
+16-bit DosQProcStatus API.
+:erev refid=330.
+:rev refid=340.
+:p.Because I wanted ps to behave more like its *IX counterparts (for use with
+GNU, MKS, etc.), I added an additional feature.  If you define the
+AIX_CORRECT environment variable, 3 things happen:  the output is sorted by
+PID, proc names are displayed in lowercase, and backslashes are translated to
+slashes.  If you do not define AIX_CORRECT, ps should work as it always has.
+:p.I just used a linked list to perform the sort because n should be fairly
+small.  I'll change the algorithm if it proves to be too slow.
+:p.In the future, I hope to make all the utilities use either back or forward
+slashes as path segment delimiters, perhaps with the same environment variable
+switch approach.  Please let me know what you think.
+:erev refid=340.
+:h2.pwd
+:p.pwd -- Displays the path name of the working directory.
+:p.Syntax:
+:xmp.
+         pwd
+:exmp.
+:p.The pwd command writes to standard output the full path name of your
+current directory (from the root directory <of the current drive>.
+All directories are separated by a < \ (backslash>.  <The current
+drive is represented first, followed by a colon, then> the root directory.
+The last directory name is your current directory.
+:h2.rm
+:p.rm  --  Deletes file objects.
+:p.Usage:
+:xmp.
+          rm &lbrk.-f&rbrk.&lbrk.-i&rbrk.&lbrk.-r&rbrk.&lbrk.-&rbrk. File &lbrk.File ...
+:exmp.
+:p.Flags
+:dl tsize=8.
+:dt.-f
+:dd.instructs program to delete even those modules that are READONLY.
+:dt.-i
+:dd.prompt user before deleting each file.  When used in conjunction
+with the -r switch, the user is also prompted as each
+subdirectory is dived into.
+:dt.-r
+:dd.recursive.  Delete all subdirectories below the indicated file object.
+:hp2.BE VERY CAREFUL WITH THIS!:ehp2.  You have been warned.
+:dt.-
+:dd.consider everything following to be a file name.  Not very useful
+in an OS/2 environment, where file names can't start with
+'-', but we retain it for conformity.
+:edl.
+:h2.sed
+:p.sed -- provides a stream editor
+:p.Syntax:
+:xmp.
+             sed &lbrk.-n&rbrk. &lbrk.-e Script&rbrk. &lbrk.-f SourceFile&rbrk.   File
+                           |              |           |
+                           |              |           |
+                           ----------------------------
+                                        |
+                                 0 or more of each
+:exmp.
+:p.Description:
+:sl.
+:li.The sed command modifies lines from the specified File according to an
+edit script and writes them to standard output.  The sed command
+includes many features for selecting lines to be modified and making
+changes only to the selected lines.
+:li.The sed command uses two work spaces for holding the line being modified:
+the pattern space, where the selected line is held; and the hold space,
+where a line can be stored temporarily.
+:li.An edit script consists of individual subcommands, each one on a
+separate line.  The general form of sed subcommands is the following:
+:xmp.
+         &lbrk.address-range&rbrk. function &lbrk.modifiers&rbrk.
+:exmp.
+:li.The sed command processes each input File by reading an input line into a
+pattern space, applying all sed subcommands in sequence whose addresses
+select that line, and writing the pattern space to standard output.
+It then clears the pattern space and repeats this process for each line
+in the input File.  Some of the subcommands use a hold space to save
+all or part of the pattern space for subsequent retrieval.
+:li.When a command includes an address (either a line number or a search
+pattern), only the addressed line or lines are affected by the command.
+Otherwise, the command is applied to all lines.
+:li.An address is either a decimal line number, a $ (dollar sign), which
+addresses the last line of input, or a context address.  A context
+address is a regular expression similar to those used in ed except
+for the following differences:
+:ul.
+:li.You can select the character delimiter for patterns.  The general
+form of the expression is
+:xmp.
+       ?pattern?
+:exmp.
+where ? is a character delimiter you select.
+The default form for the pattern is  /pattern/.
+:li.The \n sequence matches a new-line character in the pattern
+space, except the terminating new line.
+:li.A dot (.) matches any character except a terminating new-line
+character.  That is, unlike ed, which cannot match a new-line
+character in the middle of a line, sed can match a new-line
+character in the pattern space.
+:eul.
+:li.Certain commands allow you to specify one line or a range of lines
+to which the command should be applied.  These commands are called
+addressed commands.  The following rules apply to addresses commands:
+:ul.
+:li.A command line with no address selects every line.
+:li.A command line with one address, expressed in context form,
+selects each line that matches the address.
+:li.A command line with two addresses separated by commas selects
+the entire range from the first line that matches the first
+address to next line that matches the second.  If the second
+address is a number less than or equal to the line number first
+selected, only one line is selected.  Thereafter, the process
+is repeated, looking again for the first address.
+:eul.
+:esl.
+:p.NOTES:
+:ol.
+:li.The Text parameter accompanying the a\, c\ and i\ commands
+can continue onto more than one line provided all lines but
+the last end with a \ to quote the new-line character.
+Back slashes in text are treated like back slashes in the
+replacement string of an s command, and can be used to protect
+initial blanks and tabs against the stripping that is done on
+every script line.  The RFile and WFile parameters must end
+the command line and must be preceded by exactly one blank.
+Each WFile is created before processing begins.
+:li.The sed command can process up to 99 commands in a pattern file.
+:eol.
+:p.Flags
+:dl tsize=18.
+:dt.-e Script
+:dd.Uses the Script string as the editing script.  If you
+are using just one -e flag and no -f flag, the -e can
+be omitted.
+:dt.-f SourceFile
+:dd.Uses SourceFile as the source of the edit script.
+SourceFile is a prepared set of editing commands to be applied to File.
+:dt.-n
+:dd.Suppresses all information normally written to standard output.
+:edl.
+:p.Commands (the number of allowable arguments, in parentheses, is shown
+preceding the command).
+:dl tsize=30.
+:dt.(1)a\nText
+:dd.Places Text on the output before reading the next input line.
+The script syntax is a\<new line character>Text.
+:dt.(2)b&lbrk.label&rbrk.
+:dd.Branches to the : command bearing the label.  If label is
+the null string, it branches to the end of the script.
+:dt.(2)c\nText
+:dd.Deletes the pattern space; with 0 or 1 addresses, or at the
+end of a 2-address range, places Text on the output.  Then
+it starts the next cycle.
+The script syntax is c\<new line character>Text.
+:dt.(2)d
+:dd.Deletes the pattern space.  Then it starts the next cycle.
+:dt.(2)D
+:dd.Deletes the initial segment of the pattern space through
+the first new-line character.  Then it starts the next cycle.
+:dt.(2)g
+:dd.Replaces the contents of the pattern space with the contents of the
+hold space.
+:dt.(2)G
+:dd.Appends the contents of the hold space to the pattern space.
+:dt.(2)h
+:dd.Replaces the contents of the hold space with the contents of the
+pattern space.
+:dt.(2)H
+:dd.Appends the contents of the pattern space to the hold space.
+:dt.(1)i\nText
+:dd.Writes Text to standard output before reading the next line
+into the pattern space.
+The script syntax is i\<new line character>Text.
+:dt.(2)l
+:dd.Writes the pattern space to standard output showing
+non-displayable characters as 2- or 4-digit hex values.
+Long lines are folded.
+:dt.(2)n
+:dd.Writes the pattern space to standard output.  It replaces
+the pattern space with the next line of input.
+:dt.(2)N
+:dd.Appends the next line of input to the pattern space with an embedded
+new-line character (the current line number
+changes).  You can use this to search for patterns that are
+split onto two lines.
+:dt.(2)p
+:dd.Writes the pattern space to standard output.
+:dt.(2)P
+:dd.Writes the initial segment of the pattern space through the
+first new line character to standard output.
+:dt.(1)q
+:dd.Branches to the end of the script.  It does not start a
+new cycle.
+:dt.(2)r RFile
+:dd.reads the contents of RFile.  It places contents on the
+output before reading the next input line.
+:dt.(2)s/pattern/replacement/flags
+:dd.Substitutes replacement string for the first occurrence of
+the pattern in the pattern space.  Any character
+be substituted the /
+delimiter.
+:p.You can add zero or more of the following flags:
+:dl tsize=8.
+:dt.g
+:dd.Substitutes all nonoverlapping instances of the pattern parameter, rather
+than just the first one.
+:dt.p
+:dd.Writes the pattern space to standard out if a replacement was made.
+:dt.w WFile
+:dd.Writes the pattern pace to WFile if a replacement
+was made.  Appends the pattern space to WFile.
+If (WFile was not already created by a previous write
+by this sed script, sed creates it.
+:edl.
+:p.NOTE: in the replacement string, the unescaped character
+'&' stands for the text matched by the pattern string.
+:dt.(2)t label
+:dd.Branches to &colon.label in the script file if any substitutions
+were made since the most recent reading of an input line or
+execution of a t subcommand.  If you do not specify label,
+control transfers to the end of the script.
+:dt.(2)w WFile
+:dd.Appends the pattern space to WFile.
+:dt.(2)x
+:dd.Exchanges the contents of the pattern space and the hold space.
+:dt.(2)y/pattern1/pattern2/
+:dd.Replaces all occurrences of characters in pattern1 with
+the corresponding pattern2 characters.  They byte lengths
+of pattern1 and pattern2 must be equal.
+:dt.(2)! sed-cmd
+:dd.Applies the subcommand only to lines NOT selected by the address or
+adresses.
+:dt.(0)&colon.label
+:dd.This script entry simply marks a branch point to be referenced
+by the b and t commands.  This label can be any sequence
+of 8 or fewer bytes (actually, in this implementation it can be any length).
+:dt.(1)=
+:dd.Writes the current line number of standard output as a line.
+:dt.(2){subcmd ... ...}
+:dd.Groups subcommands enclosed in {} (braces).
+:edl.
+:h2.sleep
+:p.Suspends execution for an interval.
+:p.Usage:
+:xmp.
+             sleep Seconds
+:exmp.
+:p.The sleep command suspends execution of a process for the interval
+specified by :hp1.Seconds:ehp1..  :hp1.Seconds:ehp1. can range from 1
+to 32767.
+:p.To interrupt the sleep command, press ctl+break.
+:h2.split
+:p.split - splits a file into pieces
+:p.SYNTAX
+:xmp.
+   split -Number File Prefix Prefix
+:exmp.
+:p.where
+:dl tsize=14.
+:dt.-Number
+:dd.gives the number of lines to each piece of the output file
+set.  It defaults to 1000 lines.
+:dt.File
+:dd.is the name of the file to be split
+:dt.Prefix
+:dd.is the leading part of the output file name.  It defaults to 'x'.
+:edl.
+:p.DESCRIPTION
+:p.The split command reads the specified file and writes it in Number-line
+pieces (default 1000 lines) to a set of output files.  The name of the
+first output file is constructed by combining the specified prefix
+(x by default) with aa, the second by combining the prefix with ab, and
+so on lexicographically, through zz (a maximum of 676 files).  You
+cannot specify a Prefix longer than 12 characters.
+:p.For OS2, we check the first output file name.  If it is illegal for
+the
+file system, we exit.
+:h2.strings
+:p.strings - finds printable ascii strings in a binary file
+:p.Usage
+:xmp.
+          strings &lbrk.-&rbrk. &lbrk.-a&rbrk. &lbrk.-o&rbrk. &lbrk.-number&rbrk. file
+:exmp.
+:p.The strings command looks for ascii strings in a binary file.
+A  string is any sequence of 4 or more printing characters ending
+with a newline or a null.  The strings command is useful for
+identifying random object files.
+:p.Flags
+:dl tsize=12.
+:dt.-a or -
+:dd.Searches the entire file, not just data section, for
+ascii strings.  (This is always done in OS/2).
+:dt.-o
+:dd.Lists each string preceded by its offset in the file
+(in octal).
+:dt.-number
+:dd.Specified minimum string length rather than 4.
+:edl.
+:p.Examples
+:ol.
+:li.Searching a file
+:xmp.
+              strings strings
+:exmp.
+outputs
+:sl compact.
+:li.!This program cannot be run in Dos mode.
+:li.m~Cj
+:li.DOSCALLS
+:li.splits stdin
+:esl.
+and so on.
+:li.Searches for strings at least 12 characters long
+:xmp.
+              strings -12 strings
+:exmp.
+:li.Searches for strings at least 20 characters long and also shows
+offset in file.
+:xmp.
+              strings -o -20 /usr/bin/strings
+:exmp.
+:p.outputs
+:sl compact.
+:li.115 !This program cannot be run in DOS mode.
+:li.21105 strings: Could not open input file %s
+:li.21164 strings: finds printable strings in object or binary file
+:li.21260 Usage:    strings [-] [-a] [-o] [-number] file
+:esl.
+and so on.
+:eol.
+:h2.tail
+:p.Writes a file to standard output, beginning at a specified point.
+:p.Usage
+:rev refid=340.
+:xmp.
+    tail &lbrk.+/-Number&lbrk.suffix&rbrk. &lbrk.-fr&rbrk. &lbrk.File &lbrk.File &ellip.
+:exmp.
+:erev refid=340.
+:p.where
+:dl tsize=22.
+:dt.+/-Number
+:dd.indicates the starting point.  If Number is introduced
+by +, then the starting point is Number units from the
+beginning of the file.  If Number is introduced by -
+then the starting point is Number units from the end
+of the file.  Default is -10
+:dt.suffix
+:dd.is one of l, b, c or k.  If l (the default), 'units' is
+lines.  If b, then 'units' is 512-byte blocks.  If k,
+then 'units' is 1024-byte blocks.  If c, then 'units'
+is characters.
+:dt.-f
+:dd.Specifies that tail not end after copying the input
+file, but rather check at 1-second intervals for more
+input.  Thus, it can be used to monitor the growth of a
+file being written by another process.
+:dt.-r
+:dd.Displays lines from the end of the file in reverse
+order.  The default for the -r option is print
+the entire file in reverse order.
+:edl.
+:p.The tail command writes the named File (standard input by default)
+to standard output, beginning at the point you specify.  It begins
+reading at +Number lines from the beginning of File or -Number lines
+from the end of File.  The default Number is 10.  Number is counted
+in units of lines, block, or characters, according to the subflag
+appearing after Number.  The block size is either 512 bytes or
+1k bytes.
+:p.Examples.
+:ol.
+:li.To display the last 10 lines of a file:
+:xmp.
+       tail notes
+:exmp.
+:li.To specify how far from the end to start:
+:xmp.
+       tail -20 notes
+:exmp.
+:li.To specify how far from the beginning to start:
+:xmp.
+       tail +200c notes
+:exmp.
+This displays :hp4.notes:ehp4. starting with the 200th character from the
+beginning.
+:li.To follow the growth of a file:
+:xmp.
+       tail -1 -f accounts
+:exmp.
+This displays the last line of :hp4.accounts.:ehp4.  Once every second,
+the tail command displays any lines that have been added to the file.
+This continues until stopped by ctl+Break.
+:eol.
+:h2.tee
+:p.tee - read from stdin, write to stdout and one or more other files
+:p.Usage
+:xmp.
+       tee &lbrk.-a&rbrk.&lbrk.-i&rbrk. File &lbrk.File ...
+:exmp.
+:p.The tee command reads standard input and writes the output of a
+program to standard output and copies it into the specified file or
+files at the same time.
+:p.Flags
+:dl tsize=8.
+:dt.-a
+:dd.Adds the output to the end of File instead of writing over it.
+:dt.-i
+:dd.Ignores interrupts.  (This flag is accepted in the OS/2 version,
+but has no effect.)
+:edl.
+:p.The flags have to be specified separately: -i and -a but not -ia.
+:p.Implementation notes:  this version handles up to 100 output files.
+:h2.timex
+:p.timex  --  reports elapsed time for a command.
+:p.Usage:
+:xmp.
+             timex &lbrk.-o&rbrk. &lbrk.-s&rbrk. &lbrk.-p&rbrk. Command
+:exmp.
+The timex command reports, in seconds, the elapsed time for a command.
+In AIX it does lots of other neat things, too, but those neat things
+are not supported by OS/2.  For compatibility, I support the same flags,
+but they don't do anything:
+:dl tsize=8.
+:dt.-o
+:dd.Reports total number of blocks read or written and total characters
+transferred by a command and its
+children.
+:dt.-p
+:dd.Lists process accounting records for a command, and all its children.
+:dt.-s
+:dd.Reports total system activity during the execution of the command.
+:edl.
+:h2.touch
+:p.touch  --  updates the access and modification times of a file.
+:p.Usage:
+:xmp.
+        touch &lbrk.-a | -m&rbrk. &lbrk.-c&rbrk. &lbrk.-f&rbrk. &lbrk.s&rbrk. &lbrk.time&rbrk. Directory|File Directory|File ...
+:exmp.
+:p.time is in the format  MMDDHHmmyy, where
+:sl.
+:li.MM is the month number (required)
+:li.DD is the day number   (required)
+:li.HH is the hour based on a 24-hour clock (required)
+:li.mm is the minute       (required if yy is specified (defaults to 0))
+:li.yy is the last 2 digits of the year (optional, defaults to current year)
+:esl.
+:p.The touch command updates the access and modification times of each
+File or Directory names to the one specified on the command line.  If
+you do not specify Time, the touch command uses the current time.  If
+you specify a file that does not exist, the touch command creates a
+file with that name unless you request otherwise with the -c flag.
+:p.The format of the data and time are specified in the config.sys.
+:p.The return code from the touch command is the number of files for
+which the times could not be successfully modified (including files
+that did not exist and were not created).
+:p.Flags:
+:dl tsize=8.
+:dt.-a
+:dd.Changes only the access time.
+:dt.-c
+:dd.Does not create the file if it already exists
+:dt.-f
+:dd.Attempts to force the touch in spite of read and write
+permissions on a file.
+:dt.-m
+:dd.Changes only the modification time.
+:dt.-s
+:dd.Apply changes to all matching files in subtrees (OS/2 only)
+:edl.
+:h2.tr
+:p.Translates characters.
+:p.Syntax:
+:xmp.
+     tr &lbrk.-A -c -Ac -cs -s&rbrk. &lbrk.-B&rbrk. String1 String2
+        |                |
+        -----one of-------
+ 
+ or
+ 
+     tr &lbrk.-d -cd&rbrk. &lbrk.-B&rbrk. String1
+        |      |
+        -one of-
+:exmp.
+:p.Description:
+:p.The tr command copies characters form the standard input to the standard
+output with substitution or deletion of selected characters.  Input
+characters from string1 are replaced with the corresponding characters from
+String2.  The tr command cannot handle an ASCII NUL (\000) in String1
+or String2; it always deletes NUL from the input.
+:p.For compatibility with BSD, the OS/2 version has the -B flag to force
+BSD semantics on the command line.  The discussion below describes
+'AIX' semantics and 'BSD' semantics as described in the AIX commands
+reference.
+:p.In the AIX version abbreviations that can be used to introduce ranges
+of characters or repeated characters are as follows:
+:dl tsize=12.
+:dt.&lbrk.a-z&rbrk.
+:dd.Stands for a string of characters whose ASCII codes run
+from characters a to character z, inclusive.
+:dt.&lbrk.a*num&rbrk.
+:dd.Stands for the number of repetitions of a.  The num
+variable is considered to be in decimal unless the first
+digit
+of num is 0; then it is considered to be in octal.
+:edl.
+:p.In the BSD version, the abbreviation that can be used to introduce
+ranges of characters is:
+:dl tsize=12
+:dt.a-z
+:dd.Stands for a string of characters whose ASCII codes run
+from character a to character z, inclusive.  Note that
+brackets are not special characters and the hyphen is.
+:edl.
+:p.Use the escape character \ (backslash) to remove special meaning
+from
+any character in a string.  Use the \ followed by 1, 2 or 3 octal
+digits
+for (the ascii code of a character.
+:p.Flags:
+:dl tsize=8.
+:dt.-A
+:dd.Translates on a byte-by-byte basis.  The OS/2 version
+:hp1.always:ehp1.
+translates on a byte-by-byte basis.
+:dt.-B
+:dd.Forces BSD semantics for String1 and String2.
+:dt.-c
+:dd.Indicates that the characters (1-255 decimal) *not* in String1
+are to be replaced by the characters in string 2.
+:dt.-d
+:dd.Deletes all input characters in String1.
+:dt.-s
+:dd.If the translated characters are consecutively
+repeated in
+the output stream, output only one character.
+:edl.
+:p.Examples
+:ol.
+:li.To translate braces into parentheses:
+:xmp.
+      tr '{}' '()' <textfile >outfile
+:exmp.
+:p.This translates each { to ( and each } to ).  All other characters
+remain unchanged.
+:li.To translate lowercase characters to uppercase:
+:xmp.
+      tr '&lbrk.a-z&rbrk.' '&lbrk.A-Z&rbrk.' <textfile >outfile
+    or
+      tr -B a-z A-Z <textfile >outfile
+:exmp.
+:li.In the AIX version, this is what happens if the strings are not
+the same length:
+:xmp.
+      tr '&lbrk.0-9&rbrk.' '#' <textfile >outfile
+:exmp.
+:p.This translates each 0 to a # (number sign).
+:note.if the two character strings are not the same length, then
+the extra characters in the longer one are ignored.
+:enote.
+:li.In the BSD version, if the strings are not the same length:
+:xmp.
+      tr -B 0-9 #  <textfile >outfile
+:exmp.
+This translates each digit to a #.
+:note.If String2 is too short, it is padded to the length of
+String1
+by duplicating its last character.
+:enote.
+:li.In the AIX version, to translate each digit to a #:
+:xmp.
+      tr '&lbrk.0-9&rbrk.' '&lbrk.#*&rbrk.' <textfile >outfile
+:exmp.
+:p.The * tells tr to repeat the # enough times to make the second
+string as long as the first one.
+:li.To translate each string of digits to a single #:
+:xmp.
+      tr -s '&lbrk.0-9&rbrk.' '&lbrk.#*&rbrk.' <textfile >outfile
+   or
+      tr -Bs 0-9 # <textfile >outfile
+:exmp.
+:li.To translate all ASCII characters that are not specified:
+:xmp.
+      tr -c '&lbrk. -~&rbrk.' '&lbrk.A-_&rbrk.?' <textfile >outfile
+:exmp.
+:p.   This translates each nonprinting ASCII characters to the
+corresponding
+control key letter (/001 translates to "A", /002 to "B", etc.)
+ASCII DEL (/177), the character that follows ~ (tilde),
+translates
+to ?.
+:p.Or with the BSD version:
+:xmp.
+      tr -Bc ' -~' 'A-_?' <textfile >outfile
+:exmp.
+:li.To create a list of the words in a file:
+:xmp.
+      tr -cs '&lbrk.a-z&rbrk.&lbrk.A-Z&rbrk.' '&lbrk.\012*&rbrk.' <textfile >outfile
+  or
+      tr -Bcs a-z A-z '\012' <textfile >outfile
+:exmp.
+:p.This translates each string of nonalphabetic characters to a
+single
+new-line character.  The result is a list of all the words in
+textfile,
+one word per line.
+:eol.
+:h2.uniq
+:p.uniq -- Deletes repeated lines in a file.
+:p.Usage
+:xmp.
+          uniq &lbrk.-c&rbrk.&lbrk.-d&rbrk.&lbrk.-u&rbrk. &lbrk.-Number &lbrk.+Number&rbrk. ...&rbrk. InFile OutFile
+               \          /
+               one of these
+:exmp.
+:p.The uniq command reads standard input or the InFile parameter,
+compares adjacent lines, removes the second and succeeding
+occurrences
+of a line, and writes to standard output or the file specified by
+the OutFile parameter.  The InFile and OutFile parameters should
+always be different files.  Repeated lines must be on consecutive
+lines to be found.  You can arrange them with the sort command
+before
+processing.
+:p.FLAGS
+:dl tsize=12.
+:dt.-c
+:dd.Precedes each output line with a count of the number
+of times each line appears in the file.  This flag
+supersedes -d and -u.
+:dt.-d
+:dd.Displays only the repeated lines.
+:dt.-u
+:dd.Displays only the unrepeated lines.
+:dt.-Number
+:dd.Skips over the first Number fields.  A field is a string
+of non-space, non-tab characters separated by tabs
+and/or spaces from adjacent data on the same line.
+:dt.+Number
+:dd.Skips over the first Number characters.  Fields
+specified by the Number parameter are skipped before characters.
+:edl.
+:h2.uudecode
+:p.Decodes a file that has been encoded using the uuencode program
+(q.v.).
+:p.Usage:
+:xmp.
+        uudecode filename
+:exmp.
+where
+:dl tsize=14.
+:dt.filename
+:dd.is a valid path and name of the file containing the
+encoding.  If filename is not specified, input is
+taken from stdin.
+:edl.
+:p.uudecode reads the input file until it finds a valid 'begin' line.
+That line has the format
+:xmp.
+          begin rrr file-name
+:exmp.
+:p.where
+:dl tsize=14.
+:dt.begin
+:dd.is a constant, beginning in line 1.
+:dt.rrr
+:dd.is 3 octal permissions, usually 666.  These are
+ignored in the OS/2 version of uudecode.
+:dt.file-name
+:dd.is the name of the unencoded file to be created.
+:edl.
+:p.uudecode creates file-name, decodes and writes out the file.  It
+stops
+when it gets to a null line (see uuencode).
+:p.EXAMPLE
+:xmp.
+   uudecode mailfile
+:exmp.
+:p.The file mailfile is read until a valid begin line is found,
+subsequent lines are treated as uuencoded data, until a null line is
+found.
+:h2.uuencode
+:p.Encodes a file.
+:p.Syntax
+:xmp.
+       uuencode &lbrk.SourceFile&rbrk. RemoteDestination
+:exmp.
+:p.where
+:dl tsize=25.
+:dt.SourceFile
+:dd.is the name of the data file to be encoded.
+If it is not specified, input is taken from
+stdin.
+:dt.RemoteDestination
+:dd.is the name under which the uudecode program
+(q.v.) will decode file.
+:edl.
+:p.uuencode creates a file containing a 'begin' line (described under
+uudecode above), containing the permissions and the name with which
+the encoded data is to be created on decoding.  Then it encodes each
+byte of the input file.  The encoding algorithm outputs characters
+in the range 32 to 96 (decimal).  These characters normally survive
+mailers and other programs that sometimes transform characters.
+:p.EXAMPLES
+:xmp.
+   uuencode my.fil out.nam
+:exmp.
+:p.The file my.fil is read and encoded.  The string 'out.nam' is put
+in the
+'begin' record, and when uudecode decodes the file, it will create a
+file named out.nam.
+:xmp.
+   uuencode bin.fil
+:exmp.
+:p.Stdin is read and encoded.  On decoding, the file will be created as
+bin.fil.
+:h2.wc
+:p.wc  --  counts lines, words and characters
+:p.The wc command counts the number of lines, words, or characters in File or
+in the standard input if you do not specify any Files.  The command writes
+The results to standard output and keeps a total count for all named files.
+A word is defined as a string of characters delimited by spaces, tabs, or
+new-line characters.  By default, the wc command counts lines, words,
+and characters (as bytes).
+:p.Usage:
+:xmp.
+     wc &lbrk.-c&rbrk.||&lbrk.-cl&rbrk.||&lbrk.-cw&rbrk.||&lbrk.-cwl&rbrk.||&lbrk.-l&rbrk.||&lbrk.-lw&rbrk.||&lbrk.-w&rbrk.||&lbrk.-k&rbrk. {File ...
+:exmp.
+:p.Flags:
+:dl tsize=8.
+:dt.-c
+:dd.Count bytes.
+:dt.-l
+:dd.Count lines.
+:dt.-w
+:dd.Count words.
+:dt.-k
+:dd.Count actual characters, not bytes.  Specifying the -k
+flag is equivalent to specifying -kclw.
+:dt.-s
+:dd.(OS2 only). Specifies that Files matching the pattern
+are searched for in subdirectories of the specified
+directory.
+:edl.
+:p.The order of the -c, -w and -l flags is significant.  It determines the
+order of the columns.  Default is "lines" "words" "characters".
+:rev refid=350.
+:h2.what
+:p.what  --  displays identifying information in files
+:p.Usage&colon.
+:xmp.
+      what &lbrk.-s&rbrk. &lbrk.File&rbrk. &lbrk.File&rbrk. . . .
+:exmp.
+:p.Description&colon.
+:p.The what command searches specified files for all occurrences of
+the pattern that the CMVC extraction commands substitute, or the SCCS get
+command substitutes,
+for the &percent.Z&percent. keyletter (see below for a description of
+CMVC identification keywords).  By convention, the value substituted
+is "@(#)" (double quotation mark, at sign, left parenthesis,
+pound sign, right parenthesis, double quotation mark).  If no
+file is specified, the what command reads from standard input.
+:p.The what command writes to standard output whatever follows the
+pattern, up to but not including the first double quotation mark
+("), greater than symbol (>), new-line character, backslash
+(\), or null character.
+:p.The what command should be used in conjunction with the CMVC extraction
+commands or SCCS get command, which  automatically insert the identifying
+information.  You can also use the what command on files where the information
+is inserted manually.  Please refer to your CMVC or SCCS manual for more
+information on SCCS keyword expansion.
+:p.Note:  The what command may fail to find SCCS identification
+strings in executable files.
+:p.
+:p.Flags&colon.
+:dl.
+:dt.
+-s
+:dd.
+Searches for only the first occurrence of the &percent.Z&percent. pattern.
+:edl.
+:p.
+:p.Exit Status&colon.
+:p.This command returns the following exit values:
+:dl.
+:dt.
+0
+:dd.
+Any matches were found.
+:dt.
+1
+:dd.
+Otherwise.
+:edl.
+:p.
+:p.Examples&colon.
+:p.Suppose that the file test.c contains a C program that includes
+the line&colon.
+:xmp.
+      static char sccsid&lbrk.&rbrk. = "@(#)Test Program";
+:exmp.
+:p.If you compile test.c to produce test.o and a.out, then the command&colon.
+:xmp.
+      what test.c test.o a.out
+:exmp.
+:p.displays&colon.
+:xmp.
+      test.c&colon.
+      Test Program
+      test.o&colon.
+      Test Program
+      a.out&colon.
+      Test Program
+:exmp.
+:p.
+:p.Typical Usage&colon.
+:p.The keywords our development group uses for identifying modules stored in
+CMVC are
+:xmp.
+      &percent.Z&percent.&percent.M&percent.<horizontal-tab>&percent.I&percent.  &percent.W&percent.  &percent.G&percent.  &percent.U&percent.
+:exmp.
+:p.which expands to something like
+:xmp.
+      @(#)93  1.1  aixlike.ipf, aixlike.src, aixlike3, 950927  9/27/95  15&colon.42&colon.40
+:exmp.
+:p.upon extracting the file.
+:p.We usually embed the keywords in a static char array at the top of C
+files, or in a comment at the top of other files.
+:p.
+:p.CMVC Keywords&colon.
+:p.The following SCCS keywords are supported by the CMVC/6000 programs&colon.
+:dl.
+:dt.
+&percent.M&percent.
+:dd.
+The module name&colon.  the value of the m header flag in the SCCS file.  Since the
+CMVC Server/6000 defines numeric names when creating the SCCS files, expansion
+of this keyword will display the name of the file that the CMVC Server/6000 defined.
+:dt.
+&percent.I&percent.
+:dd.
+The SID (&percent.R&percent..&percent.L.B&percent..&percent.S&percent.) of the g-file.
+:dt.
+&percent.R&percent.
+:dd.
+The SCCS Release.
+:dt.
+&percent.L&percent.
+:dd.
+The SCCS Level.
+:dt.
+&percent.B&percent.
+:dd.
+The SCCS Branch.
+:dt.
+&percent.S&percent.
+:dd.
+The SCCS Sequence.
+:dt.
+&percent.D&percent.
+:dd.
+The date of the current SCCS get (YY/MM/DD).
+:dt.
+&percent.H&percent.
+:dd.
+The date of the current SCCS get (/MM/DD/YY).
+:dt.
+&percent.T&percent.
+:dd.
+The time of the current SCCS get (HH&colon.MM&colon.SS).
+:dt.
+&percent.E&percent.
+:dd.
+The date the newest applied delta was created (YY/MM/DD).
+:dt.
+&percent.G&percent.
+:dd.
+The date the newest applied delta was created (MM/DD/YY).
+:dt.
+&percent.U&percent.
+:dd.
+The time the newest applied delta was created (HH&colon.MM&colon.SS).
+:dt.
+&percent.F&percent.
+:dd.
+The SCCS file name.  Since the CMVC Server/6000 defines numeric names when
+creating the SCCS files, expansion of this keyword will display the names of the
+SCCS file that the CMVC Server/6000 defined (e.g.,
+/u/<familyName>/vc/0/0/0/1/s.22).
+:dt.
+&percent.P&percent.
+:dd.
+Full path name of the SCCS file.  Since the CMVC Server/6000 defines numeric
+names when creating the SCCS files, expansion of this keyword will display the
+name of the SCCS file that the CMVC Server/6000 defined (e.g.,
+/u/<familyName>/vc/0/0/0/1/s.22).
+:dt.
+&percent.C&percent.
+:dd.
+The current line number.  This keyword is intended for identifying messages output
+by the program.  It is not intended to be used on every line to provide sequence
+numbers.
+:dt.
+&percent.A&percent.
+:dd.
+A shorthand notation for constructing "what" strings for non-AIX program files.
+Its value is the key letters&colon.
+:xmp.
+        &percent.A&percent. = &percent.Z&percent.&percent.Y&percent.  &percent.M&percent. &percent.I&percent.&percent.Z&percent.
+:exmp.
+:dt.&percent.W&percent.
+:dd.
+A shorthand notation for constructing "what" strings for AIX program files.  Its value
+is the characters and key letters&colon.
+:xmp.
+        &percent.W&percent. = &percent.Z&percent.&percent.M&percent.<horizontal-tab>&percent.I&percent.
+:exmp.
+:p.The CMVC Server/6000 expands this keyword to the composite value&colon.
+path name, component name, release name
+:dt.
+&percent.Z&percent.
+:dd.
+The 4-character string @(#) recognized by the "what" command.
+:edl.
+:erev refid=350.
+:h2.which
+:p.Finds the path of the program or programs named on the command line,
+showing *which* copy would have been executed if the program name had
+been given on a command line.
+:p.DOES NOT DO ALIASes.  There is no standard OS/2 way of doing
+aliases.
+:p.It does expand wild cards.
+:p.All command names are searched for if an extension is not
+specified.
+First exe then cmd.
+:p.Instead of using the path in .cshrc, as the AIX version does, this
+version uses the environment variable PATH.
+:p.Syntax
+:xmp.
+            which file &lbrk.file &lbrk.file...
+:exmp.
+:rev refid=340.
+:h2.xxdecode
+:p.Decodes a file that has been encoded using the xxencode program
+(q.v.).
+:p.Usage&colon.
+:xmp.
+        xxdecode &lbrk.infile&rbrk.
+:exmp.
+where
+:dl tsize=14 .
+:dt.infile
+:dd.is a valid path and name of the file containing the
+encoding.  If infile is not specified, input is
+taken from stdin.
+:edl.
+:p.xxdecode reads the input file until it finds a valid 'begin' line.
+That line has the format
+:xmp.
+          begin rrr file-name
+:exmp.
+:p.where
+:dl tsize=14 .
+:dt.begin
+:dd.is a constant, beginning in line 1.
+:dt.rrr
+:dd.is 3 octal permissions.
+:dt.file-name
+:dd.is the name of the unencoded file to be created.
+:edl.
+:p.xxdecode creates file-name, decodes and writes out the file.  It
+stops
+when it gets to a null line (see xxencode).
+:p.EXAMPLE
+:xmp.
+   xxdecode mailfile
+:exmp.
+:p.The file mailfile is read until a valid begin line is found,
+subsequent lines are treated as xxencoded data, until a null line is
+found.
+:p.The xxdecode and xxencode utilities serve
+the same purpose as uudecode and uuencode, but use a more restricted
+character set.  xxencoded files survive VNET transmission intact.
+:p.Note that this version of xxdecode checks for a CRC placed on the
+end line.  It displays a warning message if no CRC exists (i.e., if an xxencode
+other than the one in this package was used for encoding).  If the CRC does not
+match that of the decoded file, xxdecode removes the file.  You may edit out
+the CRC to recover the contents of a corrupt file.
+.***
+:h2.xxencode
+:p.Encodes a file.
+:p.Syntax
+:xmp.
+       xxencode &lbrk.infile&rbrk. remotefile
+:exmp.
+:p.where
+:dl tsize=25 .
+:dt.infile
+:dd.is the name of the data file to be encoded.
+If it is not specified, input is taken from
+stdin.
+:dt.remotefile
+:dd.is the name under which the xxdecode program
+(q.v.) will decode file.
+:edl.
+:p.xxencode creates a file containing a 'begin' line (described under
+xxdecode above), containing the permissions and the name with which
+the encoded data is to be created on decoding.  Then it encodes each
+byte of the input file.  The encoding algorithm outputs characters
+in the set of alphanumerics, and "+" and "-".  These characters normally
+survive mailers and other programs that sometimes transform characters.
+:p.The xxdecode and xxencode utilities serve
+the same purpose as uudecode and uuencode, but use a more restricted
+character set.  xxencoded files survive VNET transmission intact.
+:p.Note that this version of xxencode adds a CRC of the encoded file to
+the end line.  The xxdecode in this package uses the CRC to check the
+integrity of the file.  If the CRC interferes with other xxdecodes, please
+let me know so that I can add a switch to turn it off.  You may remove the
+CRC with an editor if necessary.
+:erev refid=340.
+:euserdoc.
+

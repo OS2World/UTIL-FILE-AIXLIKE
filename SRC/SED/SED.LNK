@@ -1,0 +1,11 @@
+/DEBUG /ALIGN:32 /EXEPACK /M /NOI \unixlike\src\sed\sed+
+\unixlike\src\sed\pr_fgets+
+\unixlike\src\sed\sedparse+
+\unixlike\src\sed\sedapply+
+\unixlike\src\sed\sedtable+
+\unixlike\util\fmf\fmf+
+\unixlike\util\myerror\myerror+
+\unixlike\util\greputil\greputil,
+\unixlike\bin\sed.exe,
+NUL,,
+\unixlike\src\sed\sed.def;

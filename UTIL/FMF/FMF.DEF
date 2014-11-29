@@ -1,0 +1,6 @@
+NAME fmf
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'Test scaffold for fmf'
+PROTMODE
+

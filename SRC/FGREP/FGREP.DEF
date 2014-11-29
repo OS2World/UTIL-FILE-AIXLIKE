@@ -1,0 +1,7 @@
+NAME fgrep
+        WINDOWCOMPAT
+        LONGNAMES
+DESCRIPTION 'String Find Utility for OS/2'
+PROTMODE
+HEAPSIZE 4096
+
